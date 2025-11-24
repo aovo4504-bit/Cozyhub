@@ -87,11 +87,11 @@ RunService.RenderStepped:Connect(function()
         unlockInput()
         startScript3()
     else
-        -- ĐK 2: chạy Script 1 ngay, 10 giây sau Script 2
+        -- ĐK 2: chạy Script 1 ngay, 15 giây sau Script 2
         lockInput()
         if not script1Running then
             startScript1()
-            task.delay(10, function()
+            task.delay(15, function()
                 startScript2()
                 -- Script 3 KHÔNG chạy trong ĐK 2
             end)
