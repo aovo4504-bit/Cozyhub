@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <title>CozyHub Key</title>
 
-<!-- ⭐ CSS GIAO DIỆN -->
 <style>
     body {
         margin: 0;
@@ -12,14 +11,11 @@
         background: #020817;
         height: 100vh;
         display: flex;
-        flex-direction: column;
-        align-items: center;
         justify-content: center;
-        overflow: hidden;
+        align-items: center;
         color: white;
+        overflow: hidden;
     }
-
-    /* ⭐ Background vũ trụ */
     .stars {
         width: 100%;
         height: 100%;
@@ -28,106 +24,77 @@
         background-size: cover;
         z-index: -1;
     }
-
-    /* ⭐ Card glow */
     .card {
-        background: rgba(0, 0, 0, 0.55);
+        background: rgba(0,0,0,0.55);
         padding: 35px;
         width: 360px;
-        text-align: center;
         border-radius: 20px;
+        text-align: center;
         box-shadow: 0 0 45px #00eaff;
     }
-
     h1 {
-        font-size: 30px;
-        font-weight: bold;
         color: #00eaff;
-        text-shadow: 0 0 15px #00eaff;
-        margin-bottom: 10px;
+        text-shadow: 0 0 13px #00eaff;
     }
-
-    /* ⭐ Thanh loading */
     .loader {
         border: 5px solid #0e1e28;
         border-top: 5px solid #00eaff;
         border-radius: 50%;
         width: 45px;
         height: 45px;
-        margin: 15px auto;
+        margin: auto;
         animation: spin 1s linear infinite;
     }
-
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
+    @keyframes spin { to { transform: rotate(360deg);} }
     .progress-box {
-        margin-top: 10px;
-        width: 100%;
+        margin-top: 15px;
         background: #0e1e28;
         height: 12px;
         border-radius: 10px;
         overflow: hidden;
     }
-
     .progress {
+        background: #00eaff;
         height: 100%;
         width: 0%;
-        background: #00eaff;
+        animation: load 3s forwards;
         box-shadow: 0 0 20px #00eaff;
-        animation: grow 3s forwards;
     }
-
-    @keyframes grow {
-        0% { width: 0%; }
-        100% { width: 100%; }
-    }
-
-    /* ⭐ Hộp chứa key */
+    @keyframes load { 100% { width: 100%; } }
     .keybox {
-        background: black;
-        padding: 15px;
-        font-size: 18px;
-        border-radius: 12px;
-        box-shadow: 0 0 25px #00eaff inset;
-        word-break: break-all;
         margin-top: 15px;
+        padding: 12px;
+        background: #000;
+        border-radius: 12px;
+        box-shadow: inset 0 0 25px #00eaff;
+        font-size: 18px;
+        word-break: break-all;
     }
-
-    /* ⭐ Nút Copy */
     .copy-btn {
         margin-top: 15px;
         background: #00eaff;
-        color: black;
         padding: 12px;
-        font-size: 17px;
-        border: none;
         border-radius: 10px;
         width: 100%;
-        cursor: pointer;
+        border: none;
         font-weight: bold;
+        cursor: pointer;
         box-shadow: 0 0 25px #00eaff;
     }
-
-    .copy-btn:hover {
-        box-shadow: 0 0 40px #00eaff;
-    }
-
-    /* ⭐ Text thông báo */
     .msg {
         margin-top: 10px;
         color: #59ff91;
-        font-size: 16px;
         display: none;
+    }
+    .error {
+        color: #ff4d4d;
+        text-shadow: 0 0 10px #ff4d4d;
     }
 </style>
 
-<!-- ⭐ FIREBASE CODE -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA0NQVV4puksa_QzcqtQuQNCjmc_B9OIf4",
@@ -142,46 +109,81 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-/* ⭐ TẠO KEY RANDOM */
 function generateKey() {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    let key = "";
-    for (let i = 0; i < 40; i++) {
-        key += chars.charAt(Math.floor(Math.random() * chars.length));
+    let k = "";
+    for (let i = 0; i < 40; i++) k += chars[Math.floor(Math.random()*chars.length)];
+    return k;
+}
+
+async function main() {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+
+    const realToken = "COZYHUB_9d8293f2c18c4f0b9df3"; // TOKEN BẢO MẬT
+
+    const keyBox = document.getElementById("key");
+    const msg = document.getElementById("msg");
+
+    if (token !== realToken) {
+        keyBox.classList.add("error");
+        keyBox.textContent = "Bạn chưa làm nhiệm vụ!";
+        msg.textContent = "Hãy quay lại Link4m để làm nhiệm vụ.";
+        msg.style.display = "block";
+        return;
     }
-    return key;
+
+    // Load animation 3s
+    setTimeout(async () => {
+        const ip = await fetch("https://api.ipify.org?format=json")
+            .then(r=>r.json()).then(d=>d.ip);
+
+        const ipRef = ref(db, "ips/" + ip);
+        const snap = await get(ipRef);
+        const now = Date.now();
+
+        // IP đã có key → không tạo mới
+        if (snap.exists() && snap.val().expire > now) {
+            const savedKey = snap.val().key;
+            keyBox.textContent = savedKey;
+            msg.textContent = "Bạn đã lấy key rồi (còn hạn).";
+            msg.style.display = "block";
+            return;
+        }
+
+        const key = generateKey();
+        const expire = now + 24*60*60*1000;
+
+        await set(ref(db, "ips/" + ip), {
+            key: key,
+            expire: expire
+        });
+
+        await set(ref(db, "keys/" + key), {
+            key: key,
+            expire: expire,
+            used: false,
+            ip: ip
+        });
+
+        keyBox.textContent = key;
+        msg.textContent = "Key có hiệu lực 24h và chỉ dùng được 1 lần!";
+        msg.style.display = "block";
+
+    }, 3000);
 }
 
-/* ⭐ TẢI NHIỆM VỤ NHƯ LINK4M */
-setTimeout(() => {
-    document.getElementById("loadingBox").style.display = "none";
-    document.getElementById("keyBox").style.display = "block";
-}, 3000);
-
-/* ⭐ TẠO KEY SAU 3 GIÂY */
-async function run() {
-    const key = generateKey();
-    const expire = Date.now() + (24 * 60 * 60 * 1000);
-
-    await set(ref(db, "keys/" + key), {
-        key: key,
-        expire: expire
-    });
-
-    document.getElementById("key").innerHTML = key;
-}
-
-run();
+main();
 
 window.copyKey = function () {
     const key = document.getElementById("key").innerText;
     navigator.clipboard.writeText(key);
+    document.getElementById("msg").textContent = "Đã copy Key!";
     document.getElementById("msg").style.display = "block";
 }
 </script>
 
 </head>
-
 <body>
 
 <div class="stars"></div>
@@ -190,20 +192,16 @@ window.copyKey = function () {
 
     <h1>CozyHub Key</h1>
 
-    <!-- ⭐ Loading giống Link4m -->
     <div id="loadingBox">
         <div class="loader"></div>
-        <div class="progress-box">
-            <div class="progress"></div>
-        </div>
+        <div class="progress-box"><div class="progress"></div></div>
         <p>Đang xử lý nhiệm vụ...</p>
     </div>
 
-    <!-- ⭐ Hiển thị key -->
-    <div id="keyBox" style="display:none;">
+    <div id="keyBox">
         <div class="keybox" id="key">...</div>
         <button class="copy-btn" onclick="copyKey()">COPY KEY</button>
-        <div class="msg" id="msg">Đã copy vào clipboard!</div>
+        <div class="msg" id="msg"></div>
     </div>
 
 </div>
