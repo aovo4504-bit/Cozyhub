@@ -26,23 +26,24 @@
     }
     .card {
         background: rgba(0,0,0,0.55);
-        padding: 35px;
-        width: 360px;
-        border-radius: 20px;
+        padding: 40px;
+        width: 420px; /* TO RỘNG HƠN */
+        border-radius: 22px;
         text-align: center;
-        box-shadow: 0 0 45px #00eaff;
+        box-shadow: 0 0 55px #00eaff;
     }
     h1 {
         color: #00eaff;
-        text-shadow: 0 0 13px #00eaff;
-        margin-bottom: 18px;
+        text-shadow: 0 0 15px #00eaff;
+        margin-bottom: 20px;
+        font-size: 30px;
     }
     .loader {
-        border: 5px solid #0e1e28;
-        border-top: 5px solid #00eaff;
+        border: 6px solid #0e1e28;
+        border-top: 6px solid #00eaff;
         border-radius: 50%;
-        width: 45px;
-        height: 45px;
+        width: 50px;
+        height: 50px;
         margin: 0 auto 12px;
         animation: spin 1s linear infinite;
     }
@@ -60,47 +61,48 @@
         height: 100%;
         width: 0%;
         animation: load 3s forwards;
-        box-shadow: 0 0 20px #00eaff;
+        box-shadow: 0 0 25px #00eaff;
     }
     @keyframes load { 100% { width: 100%; } }
 
     .status-text {
-        margin-top: 10px;
-        font-size: 14px;
+        margin-top: 12px;
+        font-size: 15px;
     }
 
     .keybox {
-        margin-top: 15px;
-        padding: 12px;
+        margin-top: 18px;
+        padding: 14px;
         background: #000;
         border-radius: 12px;
         box-shadow: inset 0 0 25px #00eaff;
-        font-size: 18px;
+        font-size: 20px;
+        min-height: 26px;
         word-break: break-all;
-        min-height: 24px;
     }
     .keybox.error {
-        box-shadow: inset 0 0 20px #ff4d4d;
+        box-shadow: inset 0 0 22px #ff4d4d;
         color: #ff4d4d;
     }
 
     .copy-btn {
         margin-top: 15px;
         background: #00eaff;
-        padding: 12px;
+        padding: 14px;
         border-radius: 10px;
         width: 100%;
         border: none;
         font-weight: bold;
+        font-size: 16px;
         cursor: pointer;
-        box-shadow: 0 0 25px #00eaff;
+        box-shadow: 0 0 30px #00eaff;
     }
     .copy-btn:active {
         transform: scale(0.98);
     }
 
     .msg {
-        margin-top: 10px;
+        margin-top: 12px;
         color: #59ff91;
         display: none;
         font-size: 14px;
@@ -122,17 +124,16 @@ const firebaseConfig = {
   projectId: "cozyhubkey",
   storageBucket: "cozyhubkey.appspot.com",
   messagingSenderId: "1081463631644",
-  appId: "1:1081463631644:web:92c15e4b94375ecf1554d9",
-  measurementId: "G-3JHJV6ZR4J"
+  appId: "1:1081463631644:web:92c15e4b94375ecf1554d9"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// ====== CẤU HÌNH TOKEN BẢO MẬT ======
-const REAL_TOKEN = "COZYHUB_9d8293f2c18c4f0b9df3";  // phải trùng y chang trong Link4m
-// ====================================
+// TOKEN BẢO MẬT — PHẢI TRÙNG VỚI LINK4M
+const REAL_TOKEN = "COZYHUB_9d8293f2c18c4f0b9df3";
 
+// Tạo key ngẫu nhiên
 function generateKey() {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     let k = "";
@@ -144,19 +145,15 @@ function generateKey() {
 
 async function main() {
     const params = new URLSearchParams(window.location.search);
-
-    // lấy token từ URL, ưu tiên ?token=..., rồi mới tới ?code=... (cho chắc)
     let token = params.get("token") || params.get("code") || "";
-    token = token.trim();  // bỏ khoảng trắng thừa
+    token = token.trim();
 
     const keyBox = document.getElementById("key");
     const msg = document.getElementById("msg");
     const status = document.getElementById("status");
 
-    // Nếu token sai -> báo chưa làm nhiệm vụ
+    // Sai token => chưa làm nhiệm vụ
     if (token !== REAL_TOKEN) {
-        status.textContent = "Đang xử lý nhiệm vụ...";
-        // đợi animation 3s cho đẹp rồi mới báo lỗi
         setTimeout(() => {
             keyBox.classList.add("error");
             keyBox.textContent = "Bạn chưa làm nhiệm vụ!";
@@ -167,25 +164,29 @@ async function main() {
         return;
     }
 
-    // Đúng token -> xử lý tạo / lấy key
+    // Token đúng
     setTimeout(async () => {
         try {
             status.textContent = "Đang kiểm tra key...";
 
+            // Lấy IP
             const ip = await fetch("https://api.ipify.org?format=json")
                 .then(r => r.json())
                 .then(d => d.ip);
 
             const ipRef = ref(db, "ips/" + ip);
-            const snap = await get(ipRef);
+            let snap;
+
+            // An toàn: nếu lỗi Firebase thì không crash
+            try { snap = await get(ipRef); }
+            catch { snap = null; }
+
             const now = Date.now();
 
-            // Nếu IP đã có key còn hạn -> dùng lại, không tạo mới
-            if (snap.exists() && snap.val().expire > now) {
-                const savedKey = snap.val().key;
-                keyBox.textContent = savedKey;
+            // Nếu key cũ còn hạn => dùng tiếp
+            if (snap && snap.exists() && snap.val().expire > now) {
+                keyBox.textContent = snap.val().key;
                 msg.textContent = "Bạn đã lấy key rồi (còn hạn).";
-                msg.classList.remove("error");
                 msg.style.display = "block";
                 status.textContent = "Hoàn tất.";
                 return;
@@ -193,13 +194,9 @@ async function main() {
 
             // Tạo key mới
             const key = generateKey();
-            const expire = now + 24 * 60 * 60 * 1000; // 24h
+            const expire = now + 24 * 60 * 60 * 1000;
 
-            await set(ref(db, "ips/" + ip), {
-                key: key,
-                expire: expire
-            });
-
+            await set(ipRef, { key, expire });
             await set(ref(db, "keys/" + key), {
                 key: key,
                 expire: expire,
@@ -208,16 +205,16 @@ async function main() {
             });
 
             keyBox.textContent = key;
-            msg.textContent = "Key có hiệu lực 24h và chỉ dùng được 1 lần!";
-            msg.classList.remove("error");
+            msg.textContent = "Key hợp lệ 24h.";
             msg.style.display = "block";
             status.textContent = "Hoàn tất.";
-        } catch (e) {
-            console.error(e);
+
+        } catch (err) {
+            console.error(err);
             keyBox.classList.add("error");
             keyBox.textContent = "Lỗi hệ thống, thử lại sau.";
+            msg.textContent = "Không lấy được key (Firebase hoặc mạng).";
             msg.classList.add("error");
-            msg.textContent = "Không lấy được key, có thể lỗi mạng hoặc Firebase.";
             msg.style.display = "block";
             status.textContent = "Lỗi.";
         }
