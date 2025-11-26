@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Get Key - Cozy Hub</title>
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: Arial, sans-serif;
+        background: radial-gradient(circle at top, #071b34, #020712);
+        color: #fff;
+    }
+    .card {
+        width: 420px;
+        max-width: 92vw;
+        background: rgba(0, 0, 0, 0.9);
+        padding: 30px;
+        border-radius: 25px;
+        text-align: center;
+        box-shadow:
+            0 0 45px rgba(0, 255, 255, 0.6),
+            0 0 90px rgba(0, 255, 255, 0.3);
+    }
+    h1 {
+        font-size: 30px;
+        margin-bottom: 15px;
+        color: #00eaff;
+        text-shadow:
+            0 0 6px #00eaff,
+            0 0 14px #00eaff;
+    }
+    p {
+        margin-bottom: 18px;
+        color: #e0e0e0;
+    }
+    .btn {
+        width: 80%;
+        max-width: 320px;
+        padding: 14px 0;
+        background: #0b0b0b;
+        border-radius: 14px;
+        border: 2px solid #00eaff;
+        color: #fff;
+        font-weight: bold;
+        font-size: 18px;
+        cursor: pointer;
+        margin-top: 5px;
+        box-shadow:
+            0 0 20px #00eaff,
+            0 0 40px #00eaff;
+        transition: 0.25s;
+    }
+    .btn:hover {
+        transform: scale(1.05);
+        box-shadow:
+            0 0 35px #00eaff,
+            0 0 70px #00eaff;
+    }
+    .key-box {
+        margin-top: 20px;
+        padding: 12px;
+        border-radius: 10px;
+        background: #050a12;
+        border: 1px solid #00eaff;
+        font-size: 16px;
+        word-break: break-all;
+    }
+    .small {
+        font-size: 13px;
+        color: #bbbbbb;
+        margin-top: 8px;
+    }
+    .link {
+        margin-top: 20px;
+    }
+    .link a {
+        color: #00eaff;
+        text-decoration: none;
+    }
+    .link a:hover {
+        text-decoration: underline;
+    }
+</style>
+</head>
+<body>
+
+<div class="card">
+    <h1>Get Key - Cozy Hub</h1>
+    <p>Nhấn nút bên dưới để tạo key. Key có hiệu lực trong 24 giờ.</p>
+
+    <button class="btn" onclick="generateKey()">Tạo Key mới</button>
+
+    <div id="keyBox" class="key-box" style="display:none;"></div>
+    <div id="expInfo" class="small" style="display:none;"></div>
+
+    <div class="link">
+        Sau khi có key, vào trang <a href="checkkey.html">Check Key</a> để kiểm tra.
+    </div>
+</div>
+
+<script>
+// Tạo chuỗi random
+function randomPart(len) {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let s = "";
+    for (let i = 0; i < len; i++) {
+        s += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return s;
+}
+
+// Tạo key có mã thời gian bên trong
+function generateKey() {
+    const now = Date.now(); // ms
+    const tsSeconds = Math.floor(now / 1000);
+    const ts36 = tsSeconds.toString(36).toUpperCase(); // mã thời gian
+    const rand = randomPart(4);
+
+    // Định dạng key: CH-<timestamp36>-<random>
+    const key = `CH-${ts36}-${rand}`;
+
+    const expires = new Date(now + 24 * 60 * 60 * 1000);
+
+    document.getElementById("keyBox").style.display = "block";
+    document.getElementById("keyBox").textContent = key;
+
+    document.getElementById("expInfo").style.display = "block";
+    document.getElementById("expInfo").textContent =
+        "Key sẽ hết hạn sau 24 giờ (dự kiến: " + expires.toLocaleString() + ").";
+
+    // Copy vào clipboard cho tiện
+    navigator.clipboard.writeText(key).catch(()=>{});
+}
+</script>
+
+</body>
+</html>
