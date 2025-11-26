@@ -2,111 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>CozyHub Key</title>
+<title>Check Key - CozyHub</title>
 
-<style>
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #020817;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: white;
-        overflow: hidden;
-    }
-
-    .stars {
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        background: url('https://raw.githubusercontent.com/aovo4504-bit/Cozyhub/main/starsbg.gif');
-        background-size: cover;
-        z-index: -1;
-    }
-
-    .card {
-        background: rgba(0,0,0,0.55);
-        padding: 35px;
-        width: 360px;
-        border-radius: 20px;
-        text-align: center;
-        box-shadow: 0 0 45px #00eaff;
-    }
-
-    h1 {
-        text-shadow: 0 0 13px #00eaff;
-        color: #00eaff;
-        font-size: 30px;
-        margin-bottom: 15px;
-    }
-
-    .loader {
-        border: 5px solid #0e1e28;
-        border-top: 5px solid #00eaff;
-        border-radius: 50%;
-        width: 45px;
-        height: 45px;
-        margin: auto;
-        animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-        to { transform: rotate(360deg); }
-    }
-
-    .progress-box {
-        margin-top: 15px;
-        background: #0e1e28;
-        height: 12px;
-        border-radius: 10px;
-        overflow: hidden;
-    }
-    .progress {
-        height: 100%;
-        width: 0%;
-        background: #00eaff;
-        animation: bar 3s forwards;
-        box-shadow: 0 0 20px #00eaff;
-    }
-
-    @keyframes bar {
-        0% { width: 0%; }
-        100% { width: 100%; }
-    }
-
-    .keybox {
-        margin-top: 15px;
-        padding: 14px;
-        font-size: 18px;
-        background: #000;
-        border-radius: 12px;
-        box-shadow: inset 0 0 25px #00eaff;
-        word-break: break-all;
-    }
-
-    .copy-btn {
-        margin-top: 15px;
-        width: 100%;
-        background: #00eaff;
-        border: none;
-        padding: 12px;
-        border-radius: 10px;
-        font-weight: bold;
-        cursor: pointer;
-        box-shadow: 0 0 25px #00eaff;
-    }
-
-    .msg {
-        color: #59ff91;
-        margin-top: 10px;
-        display: none;
-    }
-</style>
-
-
-<!-- ⭐ FIREBASE -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
@@ -124,86 +21,50 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-function generateKey() {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    let k = "";
-    for (let i = 0; i < 40; i++) {
-        k += chars[Math.floor(Math.random()*chars.length)];
-    }
-    return k;
-}
+async function checkKey() {
+    const params = new URLSearchParams(window.location.search);
+    const key = params.get("key");
 
-async function startKey() {
-
-    // ⭐ Lấy IP người dùng
-    let ip = await fetch("https://api.ipify.org?format=json")
-        .then(r=>r.json())
-        .then(j=>j.ip);
-
-    let userRef = ref(db, "users/" + ip);
-    let snap = await get(userRef);
-
-    let now = Date.now();
-
-    // ⭐ Nếu đã có key còn hạn → trả lại key cũ
-    if (snap.exists() && snap.val().expire > now) {
-        showKey(snap.val().key);
+    if (!key) {
+        document.body.innerHTML = "NO_KEY";
         return;
     }
 
-    // ⭐ Nếu chưa có key → tạo key mới
-    const key = generateKey();
-    const expire = now + (24 * 60 * 60 * 1000);
+    const keyRef = ref(db, "keys/" + key);
+    const snap = await get(keyRef);
 
-    await set(userRef, {
-        key: key,
-        expire: expire
+    if (!snap.exists()) {
+        document.body.innerHTML = "INVALID";
+        return;
+    }
+
+    const data = snap.val();
+    const now = Date.now();
+
+    if (data.expire < now) {
+        document.body.innerHTML = "EXPIRED";
+        return;
+    }
+
+    if (data.used === true) {
+        document.body.innerHTML = "USED";
+        return;
+    }
+
+    // đánh dấu đã dùng
+    await set(keyRef, {
+        ...data,
+        used: true
     });
 
-    showKey(key);
+    document.body.innerHTML = "OK";
 }
 
-// ⭐ HIỂN THỊ KEY sau 3 giây loading
-function showKey(key) {
-    setTimeout(() => {
-        document.getElementById("loadingBox").style.display = "none";
-        document.getElementById("keyBox").style.display = "block";
-        document.getElementById("key").innerHTML = key;
-    }, 3000);
-}
-
-window.copyKey = function() {
-    navigator.clipboard.writeText(document.getElementById("key").innerText);
-    document.getElementById("msg").style.display = "block";
-}
-
-startKey();
+checkKey();
 </script>
 
 </head>
 <body>
-
-<div class="stars"></div>
-
-<div class="card">
-
-    <h1>CozyHub Key</h1>
-
-    <!-- ⭐ Loading giống Link4m -->
-    <div id="loadingBox">
-        <div class="loader"></div>
-        <div class="progress-box"><div class="progress"></div></div>
-        <p>Đang xử lý nhiệm vụ...</p>
-    </div>
-
-    <!-- ⭐ Hiển thị key -->
-    <div id="keyBox" style="display:none;">
-        <div class="keybox" id="key">...</div>
-        <button class="copy-btn" onclick="copyKey()">COPY KEY</button>
-        <div class="msg" id="msg">Đã copy key!</div>
-    </div>
-
-</div>
-
+Checking...
 </body>
 </html>
