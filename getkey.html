@@ -109,6 +109,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
+// random key
 function generateKey() {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     let k = "";
@@ -118,11 +119,12 @@ function generateKey() {
 
 async function main() {
     const params = new URLSearchParams(window.location.search);
-    const code = params.get("code");   // <-- dùng code từ Link4m
+    const code = params.get("code");   // code từ Link4m
 
     const keyBox = document.getElementById("key");
     const msg = document.getElementById("msg");
 
+    // không có code -> chưa làm nhiệm vụ
     if (!code) {
         keyBox.classList.add("error");
         keyBox.textContent = "Bạn chưa làm nhiệm vụ!";
@@ -131,14 +133,14 @@ async function main() {
         return;
     }
 
-    // Delay 3 giây cho animation
+    // cho animation chạy 3s
     setTimeout(async () => {
 
-        const refKey = ref(db, "codes/" + code);
-        const snap = await get(refKey);
+        const codeRef = ref(db, "codes/" + code);
+        const snap = await get(codeRef);
         const now = Date.now();
 
-        // Nếu code đã có key → trả lại key cũ
+        // nếu code đã có key & còn hạn -> trả lại key cũ
         if (snap.exists() && snap.val().expire > now) {
             keyBox.textContent = snap.val().key;
             msg.textContent = "Bạn đã lấy key rồi (còn hạn).";
@@ -146,15 +148,17 @@ async function main() {
             return;
         }
 
-        // Tạo key mới
+        // tạo key mới
         const key = generateKey();
-        const expire = now + 24*60*60*1000;
+        const expire = now + 24*60*60*1000; // 24h
 
-        await set(refKey, {
+        // lưu theo code (click_id)
+        await set(codeRef, {
             key: key,
             expire: expire
         });
 
+        // lưu thêm bảng keys để check trong Roblox
         await set(ref(db, "keys/" + key), {
             key: key,
             expire: expire,
