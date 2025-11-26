@@ -2,7 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Get Key - CozyHub</title>
+  <title>CozyHub Key</title>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+  }
+</style>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
@@ -15,8 +22,7 @@ const firebaseConfig = {
   projectId: "cozyhubkey",
   storageBucket: "cozyhubkey.firebasestorage.app",
   messagingSenderId: "1081463631644",
-  appId: "1:1081463631644:web:92c15e4b94375ecf1554d9",
-  measurementId: "G-3JHJV6ZR4J"
+  appId: "1:1081463631644:web:92c15e4b94375ecf1554d9"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -25,30 +31,34 @@ const db = getDatabase(app);
 function generateKey() {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   let key = "";
-  for (let i = 0; i < 32; i++) key += chars.charAt(Math.floor(Math.random() * chars.length));
+  for (let i = 0; i < 32; i++) {
+    key += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
   return key;
 }
 
 async function main() {
-  let ip = await fetch("https://api.ipify.org?format=json").then(r => r.json()).then(j => j.ip);
+  document.getElementById("key").innerHTML = "Loading...";
+
+  // Lấy IP người dùng
+  let ip = await fetch("https://api.ipify.org?format=json")
+    .then(res => res.json())
+    .then(json => json.ip);
 
   let userRef = ref(db, "users/" + ip);
-  let data = await get(userRef);
+  let snapshot = await get(userRef);
 
   let now = Date.now();
   let key, expire;
 
-  if (data.exists()) {
-    expire = data.val().expire;
-
-    if (expire > now) {
-      key = data.val().key;
-      document.getElementById("key").innerHTML = key;
-      return;
-    }
+  // Nếu đã có key còn hạn
+  if (snapshot.exists() && snapshot.val().expire > now) {
+    key = snapshot.val().key;
+    document.getElementById("key").innerHTML = key;
+    return;
   }
 
-  // tạo key mới
+  // Nếu chưa có key => tạo mới
   key = generateKey();
   expire = now + 24 * 60 * 60 * 1000;
 
@@ -61,7 +71,6 @@ async function main() {
 }
 
 main();
-
 </script>
 
 </head>
