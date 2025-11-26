@@ -74,36 +74,35 @@
         color: #bbbbbb;
         margin-top: 8px;
     }
-    .link {
-        margin-top: 20px;
-    }
-    .link a {
-        color: #00eaff;
-        text-decoration: none;
-    }
-    .link a:hover {
-        text-decoration: underline;
-    }
 </style>
 </head>
 <body>
 
 <div class="card">
     <h1>Get Key - Cozy Hub</h1>
-    <p>Nhấn nút bên dưới để tạo key. Key có hiệu lực trong 24 giờ.</p>
+    <p id="msg">Đang kiểm tra quyền truy cập...</p>
 
-    <button class="btn" onclick="generateKey()">Tạo Key mới</button>
+    <button class="btn" id="btn" onclick="generateKey()" style="display:none;">Tạo Key</button>
 
     <div id="keyBox" class="key-box" style="display:none;"></div>
     <div id="expInfo" class="small" style="display:none;"></div>
-
-    <div class="link">
-        Sau khi có key, vào trang <a href="checkkey.html">Check Key</a> để kiểm tra.
-    </div>
 </div>
 
 <script>
-// Tạo chuỗi random
+// 🔐 KIỂM TRA TOKEN
+const url = new URL(window.location.href);
+const token = url.searchParams.get("token");
+
+if (token !== "KEY123") {
+    document.getElementById("msg").innerHTML =
+        "<span style='color:#ff6b6b; font-size:17px;'>Bạn không được phép truy cập trang này.<br><br>Hãy làm nhiệm vụ Link4m trước.</span>";
+} else {
+    document.getElementById("msg").textContent =
+        "Bạn đã hoàn thành nhiệm vụ! Bấm nút bên dưới để lấy Key:";
+    document.getElementById("btn").style.display = "inline-block";
+}
+
+// ⭐ Tạo key có chứa timestamp
 function randomPart(len) {
     const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     let s = "";
@@ -113,14 +112,10 @@ function randomPart(len) {
     return s;
 }
 
-// Tạo key có mã thời gian bên trong
 function generateKey() {
-    const now = Date.now(); // ms
-    const tsSeconds = Math.floor(now / 1000);
-    const ts36 = tsSeconds.toString(36).toUpperCase(); // mã thời gian
+    const now = Date.now();
+    const ts36 = Math.floor(now / 1000).toString(36).toUpperCase();
     const rand = randomPart(4);
-
-    // Định dạng key: CH-<timestamp36>-<random>
     const key = `CH-${ts36}-${rand}`;
 
     const expires = new Date(now + 24 * 60 * 60 * 1000);
@@ -132,7 +127,6 @@ function generateKey() {
     document.getElementById("expInfo").textContent =
         "Key sẽ hết hạn sau 24 giờ (dự kiến: " + expires.toLocaleString() + ").";
 
-    // Copy vào clipboard cho tiện
     navigator.clipboard.writeText(key).catch(()=>{});
 }
 </script>
