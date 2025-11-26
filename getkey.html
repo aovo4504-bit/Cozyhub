@@ -118,14 +118,12 @@ function generateKey() {
 
 async function main() {
     const params = new URLSearchParams(window.location.search);
-    const token = params.get("token");
-
-    const realToken = "COZYHUB_9d8293f2c18c4f0b9df3"; // TOKEN BẢO MẬT
+    const code = params.get("code");   // <-- dùng code từ Link4m
 
     const keyBox = document.getElementById("key");
     const msg = document.getElementById("msg");
 
-    if (token !== realToken) {
+    if (!code) {
         keyBox.classList.add("error");
         keyBox.textContent = "Bạn chưa làm nhiệm vụ!";
         msg.textContent = "Hãy quay lại Link4m để làm nhiệm vụ.";
@@ -133,28 +131,26 @@ async function main() {
         return;
     }
 
-    // Load animation 3s
+    // Delay 3 giây cho animation
     setTimeout(async () => {
-        const ip = await fetch("https://api.ipify.org?format=json")
-            .then(r=>r.json()).then(d=>d.ip);
 
-        const ipRef = ref(db, "ips/" + ip);
-        const snap = await get(ipRef);
+        const refKey = ref(db, "codes/" + code);
+        const snap = await get(refKey);
         const now = Date.now();
 
-        // IP đã có key → không tạo mới
+        // Nếu code đã có key → trả lại key cũ
         if (snap.exists() && snap.val().expire > now) {
-            const savedKey = snap.val().key;
-            keyBox.textContent = savedKey;
+            keyBox.textContent = snap.val().key;
             msg.textContent = "Bạn đã lấy key rồi (còn hạn).";
             msg.style.display = "block";
             return;
         }
 
+        // Tạo key mới
         const key = generateKey();
         const expire = now + 24*60*60*1000;
 
-        await set(ref(db, "ips/" + ip), {
+        await set(refKey, {
             key: key,
             expire: expire
         });
@@ -163,7 +159,7 @@ async function main() {
             key: key,
             expire: expire,
             used: false,
-            ip: ip
+            code: code
         });
 
         keyBox.textContent = key;
