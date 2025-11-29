@@ -27,7 +27,7 @@
     .card {
         background: rgba(0,0,0,0.55);
         padding: 40px;
-        width: 420px; /* TO RỘNG HƠN */
+        width: 420px;
         border-radius: 22px;
         text-align: center;
         box-shadow: 0 0 55px #00eaff;
@@ -164,7 +164,6 @@ async function main() {
         return;
     }
 
-    // Token đúng
     setTimeout(async () => {
         try {
             status.textContent = "Đang kiểm tra key...";
@@ -174,16 +173,17 @@ async function main() {
                 .then(r => r.json())
                 .then(d => d.ip);
 
-            const ipRef = ref(db, "ips/" + ip);
-            let snap;
+            // *** FIX LỖI IP CÓ DẤU CHẤM ***
+            const safeIP = ip.replace(/\./g, "_");
 
-            // An toàn: nếu lỗi Firebase thì không crash
+            const ipRef = ref(db, "ips/" + safeIP);
+
+            let snap;
             try { snap = await get(ipRef); }
             catch { snap = null; }
 
             const now = Date.now();
 
-            // Nếu key cũ còn hạn => dùng tiếp
             if (snap && snap.exists() && snap.val().expire > now) {
                 keyBox.textContent = snap.val().key;
                 msg.textContent = "Bạn đã lấy key rồi (còn hạn).";
@@ -197,11 +197,12 @@ async function main() {
             const expire = now + 24 * 60 * 60 * 1000;
 
             await set(ipRef, { key, expire });
+
             await set(ref(db, "keys/" + key), {
                 key: key,
                 expire: expire,
                 used: false,
-                ip: ip
+                ip: safeIP
             });
 
             keyBox.textContent = key;
