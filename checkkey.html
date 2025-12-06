@@ -2,43 +2,19 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Check Key - CozyHub</title>
+<title>Check Key</title>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
-/* Auto language */
-const lang = (navigator.language || "en").startsWith("vi") ? "vi" : "en";
-
-const TEXT = {
-    no_key: {
-        vi: "Không có key!",
-        en: "No key provided!"
-    },
-    invalid: {
-        vi: "Key không tồn tại!",
-        en: "Key does not exist!"
-    },
-    expired: {
-        vi: "Key đã hết hạn!",
-        en: "Key has expired!"
-    },
-    used: {
-        vi: "Key đã được sử dụng!",
-        en: "Key already used!"
-    },
-    ok: {
-        vi: "Key hợp lệ!",
-        en: "Key valid!"
-    }
-};
-
-/* Firebase config */
+/* =====================================
+      FIREBASE CONFIG GIỮ NGUYÊN
+===================================== */
 const firebaseConfig = {
   apiKey: "AIzaSyA0NQVV4puksa_QzcqtQuQNCjmc_B9OIf4",
   authDomain: "cozyhubkey.firebaseapp.com",
-  databaseURL: "https://cozyhubkey-default-rtdb.asia-southeast1.firebasedatabase.app/",
+  databaseURL: "https://cozyhubkey-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "cozyhubkey",
   storageBucket: "cozyhubkey.appspot.com",
   messagingSenderId: "1081463631644",
@@ -48,58 +24,90 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-async function run() {
+/* =====================================
+     SHA-256 HASH (vì key lưu dạng hash)
+===================================== */
+async function sha256(str) {
+    const buf = new TextEncoder().encode(str);
+    const hash = await crypto.subtle.digest("SHA-256", buf);
+    return Array.from(new Uint8Array(hash))
+        .map(b => b.toString(16).padStart(2, "0"))
+        .join("");
+}
+
+/* =====================================
+       LẤY HWID BẰNG TRÌNH DUYỆT
+===================================== */
+async function getHWID() {
+    const data = navigator.userAgent + navigator.platform;
+    return sha256(data);
+}
+
+/* =====================================
+           CHECK KEY CHÍNH
+===================================== */
+async function main() {
     const params = new URLSearchParams(window.location.search);
     const key = (params.get("key") || "").trim();
 
     if (!key) {
-        document.body.innerText = JSON.stringify({
-            status: "NO_KEY",
-            message: TEXT.no_key[lang]
-        });
+        document.body.innerText = "NO_KEY";
         return;
     }
 
-    const keyRef = ref(db, "keys/" + key);
+    // Hash key để check Firebase
+    const hash = await sha256(key);
+
+    const keyRef = ref(db, "keys/" + hash);
     const snap = await get(keyRef);
 
     if (!snap.exists()) {
-        document.body.innerText = JSON.stringify({
-            status: "INVALID",
-            message: TEXT.invalid[lang]
-        });
+        document.body.innerText = "INVALID";
         return;
     }
 
     const data = snap.val();
     const now = Date.now();
 
-    if (!data.expire || data.expire < now) {
-        document.body.innerText = JSON.stringify({
-            status: "EXPIRED",
-            message: TEXT.expired[lang]
-        });
+    // 1. Expired?
+    if (data.expire < now) {
+        document.body.innerText = "EXPIRED";
         return;
     }
 
+    // 2. Used?
     if (data.used === true) {
-        document.body.innerText = JSON.stringify({
-            status: "USED",
-            message: TEXT.used[lang]
-        });
+        document.body.innerText = "USED";
         return;
     }
 
-    // đánh dấu đã dùng, không xóa dữ liệu khác
+    // 3. IP Lock
+    const ip = await fetch("https://api.ipify.org?format=json")
+        .then(r => r.json()).then(j => j.ip.replace(/\./g, "_"));
+
+    if (data.ip !== ip) {
+        document.body.innerText = "IP_MISMATCH";
+        return;
+    }
+
+    // 4. HWID Lock (auto bind first time)
+    const hwid = await getHWID();
+
+    if (!data.hwid) {
+        await update(keyRef, { hwid: hwid });
+    } else if (data.hwid !== hwid) {
+        document.body.innerText = "HWID_MISMATCH";
+        return;
+    }
+
+    // 5. Đánh dấu đã dùng
     await update(keyRef, { used: true });
 
-    document.body.innerText = JSON.stringify({
-        status: "OK",
-        message: TEXT.ok[lang]
-    });
+    // 6. Trả kết quả
+    document.body.innerText = "OK";
 }
 
-run();
+main();
 </script>
 </head>
 <body>
