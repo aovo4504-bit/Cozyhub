@@ -17,11 +17,11 @@
         color: white;
     }
 
-    .bg {
+    /* NỀN SAO PARALLAX */
+    canvas#stars {
         position: fixed;
         inset: 0;
-        background: radial-gradient(circle at top, #112233, #05070d 80%);
-        z-index: -2;
+        z-index: -1;
     }
 
     .card {
@@ -51,6 +51,7 @@
         text-shadow: 0 0 12px rgba(0,255,255,0.5);
     }
 
+    /* LOADER → TICK */
     .loader {
         border: 5px solid #18202c;
         border-top: 5px solid #00eaff;
@@ -59,8 +60,16 @@
         margin: 0 auto;
         border-radius: 50%;
         animation: spin 1.15s linear infinite;
+        transition: opacity 0.3s ease;
     }
     @keyframes spin { to { transform: rotate(360deg);} }
+
+    .tick {
+        font-size: 45px;
+        color: #00eaff;
+        display: none;
+        text-shadow: 0 0 15px #00eaff;
+    }
 
     .status {
         margin-top: 15px;
@@ -85,6 +94,15 @@
     }
     .keybox.show { opacity: 1; transform: translateY(0); }
 
+    .expire {
+        margin-top: 10px;
+        font-size: 14px;
+        opacity: 0;
+        transition: 0.3s ease;
+        color: #00eaff;
+    }
+    .expire.show { opacity: 1; }
+
     .copy-btn {
         margin-top: 15px;
         padding: 12px 0;
@@ -101,8 +119,18 @@
         opacity: 0;
         transform: translateY(10px);
     }
+
     .copy-btn.show { opacity: 1; transform: translateY(0); }
-    .copy-btn:hover { transform: scale(1.03); }
+
+    .copy-btn.pulse {
+        animation: pulse 0.35s ease;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.08); }
+        100% { transform: scale(1); }
+    }
 
     .msg {
         margin-top: 12px;
@@ -114,52 +142,72 @@
 
     .msg.error { color: #ff4d4d; }
     .msg.ok { color: #59ff91; }
+
 </style>
 
 <script type="module">
+/* =============== STARS BACKGROUND =============== */
+const canvas = document.createElement("canvas");
+canvas.id = "stars";
+document.body.appendChild(canvas);
+
+const ctx = canvas.getContext("2d");
+let W, H;
+
+function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+}
+resize();
+window.onresize = resize;
+
+const stars = [];
+for (let i = 0; i < 180; i++) {
+    stars.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        z: Math.random() * 2 + 1
+    });
+}
+
+function animateStars() {
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = "white";
+
+    for (let s of stars) {
+        ctx.globalAlpha = 0.5 + Math.random() * 0.3;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.z, 0, Math.PI * 2);
+        ctx.fill();
+
+        s.y += s.z * 0.4;
+        if (s.y > H) {
+            s.y = 0;
+            s.x = Math.random() * W;
+        }
+    }
+    requestAnimationFrame(animateStars);
+}
+animateStars();
+
+/* ============ MULTI LANGUAGE (EN / VI) ============ */
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
-
-/* ======================
-   AUTO LANGUAGE EN / VI
-====================== */
 
 const lang = (navigator.language || "en").startsWith("vi") ? "vi" : "en";
 
 const TEXT = {
-    title: {
-        vi: "CozyHub Key",
-        en: "CozyHub Key"
-    },
-    loading: {
-        vi: "Đang xử lý...",
-        en: "Processing..."
-    },
-    access_denied: {
-        vi: "Bạn chưa làm nhiệm vụ!",
-        en: "You haven't completed the task!"
-    },
-    already_taken: {
-        vi: "Bạn đã lấy key rồi.",
-        en: "You already claimed your key."
-    },
-    key_valid: {
-        vi: "Key hợp lệ 24 giờ.",
-        en: "Your key is valid for 24 hours."
-    },
-    cannot_get: {
-        vi: "Không thể lấy key!",
-        en: "Unable to fetch key!"
-    },
-    copied: {
-        vi: "Đã copy!",
-        en: "Copied!"
-    }
+    title: { vi: "CozyHub Key", en: "CozyHub Key" },
+    loading: { vi: "Đang xử lý...", en: "Processing..." },
+    denied: { vi: "Bạn chưa làm nhiệm vụ!", en: "Access denied!" },
+    taken: { vi: "Bạn đã lấy key rồi.", en: "You already claimed your key." },
+    valid: { vi: "Key hợp lệ 24 giờ.", en: "Key valid for 24 hours." },
+    cannot: { vi: "Không thể lấy key!", en: "Unable to fetch key!" },
+    copied: { vi: "Đã copy!", en: "Copied!" }
 };
 
-/* ======================
-        FIREBASE
-====================== */
+/* ============ FIREBASE ============ */
 
 const firebaseConfig = {
   apiKey: "AIzaSyA0NQVV4puksa_QzcqtQuQNCjmc_B9OIf4",
@@ -174,118 +222,146 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// Token phải trùng Link4m
 const REAL_TOKEN = "COZYHUB_9d8293f2c18c4f0b9df3";
 
-/* KEY FORMAT XXXX-XXXX-XXXX-XXXX */
+/* ============ KEY FORMAT (4–4–4–4) ============ */
+
 function generateKey() {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     let raw = "";
-    for (let i = 0; i < 16; i++) {
-        raw += chars[Math.floor(Math.random() * chars.length)];
-    }
-    // format 4-4-4-4
-    return `${raw.slice(0,4)}-${raw.slice(4,8)}-${raw.slice(8,12)}-${raw.slice(12,16)}`;
+    for (let i = 0; i < 16; i++) raw += chars[Math.floor(Math.random() * chars.length)];
+    return `${raw.slice(0,4)}-${raw.slice(4,8)}-${raw.slice(8,12)}-${raw.slice(12)}`;
 }
 
+/* ============ MAIN LOGIC ============ */
+
 async function main() {
+    const title = document.getElementById("title");
+    const loader = document.getElementById("loader");
+    const tick = document.getElementById("tick");
+    const keyBox = document.getElementById("key");
+    const msg = document.getElementById("msg");
+    const copyBtn = document.getElementById("copy");
+    const expireBox = document.getElementById("expire");
+
+    title.textContent = TEXT.title[lang];
     document.getElementById("status").textContent = TEXT.loading[lang];
-    document.getElementById("title").textContent = TEXT.title[lang];
 
     const params = new URLSearchParams(window.location.search);
     const token = (params.get("token") || "").trim();
 
-    const keyBox = document.getElementById("key");
-    const msg = document.getElementById("msg");
-    const copyBtn = document.getElementById("copy");
-
     if (token !== REAL_TOKEN) {
         setTimeout(() => {
+            loader.style.display = "none";
+            tick.style.display = "block";
+
             keyBox.textContent = "ACCESS DENIED";
             keyBox.classList.add("show");
-            msg.textContent = TEXT.access_denied[lang];
+
+            msg.textContent = TEXT.denied[lang];
             msg.classList.add("error", "show");
-        }, 2000);
+        }, 2200);
         return;
     }
 
     setTimeout(async () => {
         try {
-            const ip = await fetch("https://api.ipify.org?format=json")
-                .then(r => r.json()).then(d => d.ip);
+            const ip = await fetch("https://api.ipify.org?format=json").then(r => r.json()).then(d => d.ip);
+            const safe = ip.replace(/\./g, "_");
 
-            const safeIP = ip.replace(/\./g, "_");
-            const ipRef = ref(db, "ips/" + safeIP);
-            const snap = await get(ipRef);
             const now = Date.now();
+            const ipRef = ref(db, "ips/" + safe);
+            const snap = await get(ipRef);
 
-            // Nếu có key còn hạn -> trả lại key cũ
             if (snap.exists() && snap.val().expire > now) {
-                const oldKey = snap.val().key;
-                keyBox.textContent = oldKey;
-                keyBox.classList.add("show");
-                copyBtn.classList.add("show");
-
-                msg.textContent = TEXT.already_taken[lang];
-                msg.classList.add("ok", "show");
+                showKey(snap.val().key, snap.val().expire - now, true);
                 return;
             }
 
-            // Tạo key mới
             const key = generateKey();
-            const expire = now + 24 * 60 * 60 * 1000;
+            const expire = now + 86400000;
 
             await set(ipRef, { key, expire });
             await set(ref(db, "keys/" + key), {
                 key,
                 expire,
                 used: false,
-                ip: safeIP
+                ip: safe
             });
 
-            keyBox.textContent = key;
-            keyBox.classList.add("show");
-            copyBtn.classList.add("show");
-
-            msg.textContent = TEXT.key_valid[lang];
-            msg.classList.add("ok", "show");
+            showKey(key, expire - now, false);
 
         } catch (err) {
-            console.error(err);
+            loader.style.display = "none";
             keyBox.textContent = "ERROR";
             keyBox.classList.add("show");
-            msg.textContent = TEXT.cannot_get[lang];
+
+            msg.textContent = TEXT.cannot[lang];
             msg.classList.add("error", "show");
         }
     }, 2300);
+
+    /* ============ FUNCTION: SHOW KEY ============ */
+
+    function showKey(key, leftTime, existed) {
+        loader.style.display = "none";
+        tick.style.display = "block";
+
+        const hrs = Math.floor(leftTime / 3600000);
+        const mins = Math.floor((leftTime % 3600000) / 60000);
+
+        keyBox.textContent = key;
+        keyBox.classList.add("show");
+
+        expireBox.textContent =
+            lang === "vi"
+                ? `Còn lại: ${hrs} giờ ${mins} phút`
+                : `Time left: ${hrs}h ${mins}m`;
+
+        expireBox.classList.add("show");
+
+        copyBtn.classList.add("show");
+
+        msg.textContent = existed ? TEXT.taken[lang] : TEXT.valid[lang];
+        msg.classList.add("ok", "show");
+    }
+
+    /* ============ COPY BUTTON ============ */
+
+    window.copyKey = function () {
+        const key = keyBox.textContent.trim();
+        if (!key || key === "ERROR" || key === "ACCESS DENIED") return;
+
+        navigator.clipboard.writeText(key);
+
+        copyBtn.classList.add("pulse");
+        setTimeout(() => copyBtn.classList.remove("pulse"), 350);
+
+        msg.textContent = TEXT.copied[lang];
+        msg.classList.remove("error");
+        msg.classList.add("ok", "show");
+    };
 }
 
 main();
-
-window.copyKey = function () {
-    const key = document.getElementById("key").innerText.trim();
-    if (!key || key === "..." || key === "ERROR" || key === "ACCESS DENIED") return;
-
-    navigator.clipboard.writeText(key);
-    const msg = document.getElementById("msg");
-    msg.textContent = TEXT.copied[lang];
-    msg.classList.remove("error");
-    msg.classList.add("ok", "show");
-};
 </script>
 </head>
 <body>
 
-<div class="bg"></div>
+<canvas id="stars"></canvas>
 
 <div class="card">
     <div class="logo"></div>
     <h1 id="title">CozyHub Key</h1>
 
-    <div class="loader"></div>
+    <div id="loader" class="loader"></div>
+    <div id="tick" class="tick">✔</div>
+
     <div class="status" id="status">Processing...</div>
 
     <div id="key" class="keybox">...</div>
+    <div id="expire" class="expire"></div>
+
     <button id="copy" class="copy-btn" onclick="copyKey()">COPY</button>
     <div id="msg" class="msg"></div>
 </div>
