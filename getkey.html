@@ -7,8 +7,8 @@
 <style>
     body {
         margin: 0;
-        font-family: 'Poppins', sans-serif;
-        background: #0c0f17;
+        font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        background: radial-gradient(circle at top, #111827, #020617 70%);
         height: 100vh;
         display: flex;
         justify-content: center;
@@ -17,197 +17,208 @@
         color: white;
     }
 
-    /* NỀN SAO PARALLAX */
-    canvas#stars {
-        position: fixed;
-        inset: 0;
-        z-index: -1;
-    }
-
+    /* viền glow to, giống hub lớn */
     .card {
-        width: 420px;
-        background: rgba(10, 14, 25, 0.88);
-        padding: 35px 30px;
+        width: 430px;
+        max-width: 92vw;
+        padding: 34px 30px 30px;
         border-radius: 26px;
         text-align: center;
-        box-shadow: 0 0 60px rgba(0, 255, 255, 0.28);
-        border: 1px solid rgba(0,255,255,0.2);
+        background: rgba(10, 14, 25, 0.92);
+        box-shadow:
+            0 0 60px rgba(0, 255, 255, 0.22),
+            0 0 120px rgba(0, 255, 255, 0.18);
+        border: 1px solid rgba(0, 255, 255, 0.22);
     }
 
     .logo {
         width: 110px;
         height: 110px;
-        margin: 0 auto 18px;
+        margin: 0 auto 16px;
         border-radius: 50%;
-        background: url('https://raw.githubusercontent.com/aovo4504-bit/Cozyhub/main/IMG_0830.png')
-            center/cover;
-        box-shadow: 0 0 25px #00eaff, 0 0 50px rgba(0,255,255,0.5);
+        background: url('https://raw.githubusercontent.com/aovo4504-bit/Cozyhub/main/IMG_0830.png') center/cover;
+        box-shadow:
+            0 0 24px #00eaff,
+            0 0 50px rgba(0, 255, 255, 0.6);
     }
 
     h1 {
-        font-size: 32px;
-        margin: 10px 0 25px;
+        font-size: 30px;
+        margin: 6px 0 16px;
         color: #00eaff;
-        text-shadow: 0 0 12px rgba(0,255,255,0.5);
+        text-shadow: 0 0 12px rgba(0,255,255,0.55);
     }
 
-    /* LOADER → TICK */
-    .loader {
-        border: 5px solid #18202c;
-        border-top: 5px solid #00eaff;
-        width: 48px;
-        height: 48px;
+    /* loader ban đầu – sau khi xong đổi thành dấu tick */
+    .status-icon {
+        width: 56px;
+        height: 56px;
         margin: 0 auto;
         border-radius: 50%;
-        animation: spin 1.15s linear infinite;
-        transition: opacity 0.3s ease;
-    }
-    @keyframes spin { to { transform: rotate(360deg);} }
-
-    .tick {
-        font-size: 45px;
-        color: #00eaff;
-        display: none;
-        text-shadow: 0 0 15px #00eaff;
+        border: 5px solid #1f2933;
+        border-top-color: #00eaff;
+        animation: spin 1.1s linear infinite;
     }
 
-    .status {
-        margin-top: 15px;
-        opacity: 0.8;
+    .status-icon.done {
+        animation: none;
+        border-color: transparent;
+        position: relative;
+    }
+
+    .status-icon.done::before {
+        content: "✓";
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        color: #00ff9c;
+        text-shadow: 0 0 14px rgba(0,255,180,0.7);
+    }
+
+    .status-text {
+        margin-top: 13px;
         font-size: 15px;
+        opacity: 0.85;
     }
 
     .keybox {
-        margin-top: 22px;
+        margin-top: 20px;
         padding: 14px;
-        border-radius: 12px;
-        background: rgba(0,0,0,0.55);
+        background: rgba(0,0,0,0.6);
+        border-radius: 13px;
+        border: 1px solid rgba(0,255,255,0.36);
+        box-shadow: inset 0 0 22px rgba(0,255,255,0.34);
         font-size: 18px;
-        min-height: 26px;
         letter-spacing: 1px;
-        text-align: center;
-        border: 1px solid rgba(0,255,255,0.35);
-        box-shadow: inset 0 0 22px rgba(0,255,255,0.35);
-        transition: 0.3s ease;
+        min-height: 26px;
+        word-break: break-all;
         opacity: 0;
         transform: translateY(10px);
+        transition: 0.28s ease;
     }
-    .keybox.show { opacity: 1; transform: translateY(0); }
 
-    .expire {
-        margin-top: 10px;
-        font-size: 14px;
-        opacity: 0;
-        transition: 0.3s ease;
-        color: #00eaff;
+    .keybox.show {
+        opacity: 1;
+        transform: translateY(0);
     }
-    .expire.show { opacity: 1; }
+
+    .keybox.error {
+        border-color: rgba(255,77,77,0.75);
+        box-shadow: inset 0 0 20px rgba(255,77,77,0.7);
+        color: #ff7777;
+    }
+
+    .expire-line {
+        margin-top: 8px;
+        font-size: 13px;
+        opacity: 0.78;
+    }
 
     .copy-btn {
-        margin-top: 15px;
+        margin-top: 16px;
         padding: 12px 0;
         width: 100%;
-        font-weight: bold;
-        border-radius: 10px;
+        border-radius: 11px;
         border: none;
         cursor: pointer;
+        font-weight: 600;
+        letter-spacing: 0.3px;
         background: #00eaff;
-        color: #001015;
+        color: #00151b;
         font-size: 16px;
-        box-shadow: 0 0 25px rgba(0,255,255,0.4);
-        transition: 0.25s;
+        box-shadow: 0 0 26px rgba(0,255,255,0.42);
+        transition: 0.22s ease;
         opacity: 0;
         transform: translateY(10px);
     }
 
-    .copy-btn.show { opacity: 1; transform: translateY(0); }
-
-    .copy-btn.pulse {
-        animation: pulse 0.35s ease;
+    .copy-btn.show {
+        opacity: 1;
+        transform: translateY(0);
     }
 
-    @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.08); }
-        100% { transform: scale(1); }
+    .copy-btn:hover {
+        transform: translateY(0) scale(1.03);
     }
 
     .msg {
-        margin-top: 12px;
+        margin-top: 10px;
         font-size: 14px;
         opacity: 0;
-        transition: 0.3s;
+        transition: 0.25s ease;
     }
-    .msg.show { opacity: 1; }
 
-    .msg.error { color: #ff4d4d; }
-    .msg.ok { color: #59ff91; }
+    .msg.show {
+        opacity: 1;
+    }
 
+    .msg.ok {
+        color: #4ade80;
+    }
+
+    .msg.error {
+        color: #fb7185;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 
 <script type="module">
-/* =============== STARS BACKGROUND =============== */
-const canvas = document.createElement("canvas");
-canvas.id = "stars";
-document.body.appendChild(canvas);
-
-const ctx = canvas.getContext("2d");
-let W, H;
-
-function resize() {
-    W = canvas.width = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-}
-resize();
-window.onresize = resize;
-
-const stars = [];
-for (let i = 0; i < 180; i++) {
-    stars.push({
-        x: Math.random() * W,
-        y: Math.random() * H,
-        z: Math.random() * 2 + 1
-    });
-}
-
-function animateStars() {
-    ctx.clearRect(0,0,W,H);
-    ctx.fillStyle = "white";
-
-    for (let s of stars) {
-        ctx.globalAlpha = 0.5 + Math.random() * 0.3;
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.z, 0, Math.PI * 2);
-        ctx.fill();
-
-        s.y += s.z * 0.4;
-        if (s.y > H) {
-            s.y = 0;
-            s.x = Math.random() * W;
-        }
-    }
-    requestAnimationFrame(animateStars);
-}
-animateStars();
-
-/* ============ MULTI LANGUAGE (EN / VI) ============ */
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
-const lang = (navigator.language || "en").startsWith("vi") ? "vi" : "en";
+/* ========================
+   0. Auto EN / VI text
+======================== */
+
+const lang = (navigator.language || "en").toLowerCase().startsWith("vi") ? "vi" : "en";
 
 const TEXT = {
     title: { vi: "CozyHub Key", en: "CozyHub Key" },
-    loading: { vi: "Đang xử lý...", en: "Processing..." },
-    denied: { vi: "Bạn chưa làm nhiệm vụ!", en: "Access denied!" },
-    taken: { vi: "Bạn đã lấy key rồi.", en: "You already claimed your key." },
-    valid: { vi: "Key hợp lệ 24 giờ.", en: "Key valid for 24 hours." },
-    cannot: { vi: "Không thể lấy key!", en: "Unable to fetch key!" },
-    copied: { vi: "Đã copy!", en: "Copied!" }
+    processing: { vi: "Đang xử lý...", en: "Processing..." },
+    access_denied: {
+        vi: "Bạn chưa làm nhiệm vụ! Hãy quay lại Link4m.",
+        en: "You haven't completed the task. Please go back to Link4m."
+    },
+    already_taken: {
+        vi: "Bạn đã lấy key rồi.",
+        en: "You already claimed your key."
+    },
+    key_valid: {
+        vi: "Key hợp lệ 24 giờ.",
+        en: "Your key is valid for 24 hours."
+    },
+    cannot_get: {
+        vi: "Không thể lấy key, thử lại sau.",
+        en: "Unable to fetch key, please try again later."
+    },
+    copied: {
+        vi: "Đã copy key!",
+        en: "Key copied!"
+    },
+    banned: {
+        vi: "IP / thiết bị này đã bị chặn.",
+        en: "This IP / device is banned."
+    },
+    vpn_block: {
+        vi: "Vui lòng tắt VPN/Proxy rồi thử lại.",
+        en: "Please disable VPN/Proxy and try again."
+    },
+    remain_prefix: { vi: "Còn lại:", en: "Remaining:" },
+    remain_hours:  { vi: "giờ",  en: "h" },
+    remain_minutes:{ vi: "phút", en: "min" },
+    devtools_block:{
+        vi: "Hệ thống đã chặn DevTools. Đóng bảng F12 / Inspect rồi reload.",
+        en: "DevTools detected. Close F12 / Inspect and reload the page."
+    }
 };
 
-/* ============ FIREBASE ============ */
+/* ========================
+      1. Firebase config
+======================== */
 
 const firebaseConfig = {
   apiKey: "AIzaSyA0NQVV4puksa_QzcqtQuQNCjmc_B9OIf4",
@@ -222,145 +233,248 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
+/* ========================
+    2. Security constants
+======================== */
+
+// Token phải khớp với Link4m
 const REAL_TOKEN = "COZYHUB_9d8293f2c18c4f0b9df3";
 
-/* ============ KEY FORMAT (4–4–4–4) ============ */
+/* Nếu bạn có API key VPN, điền vào đây.
+   Nếu để "YOUR_VPN_API_KEY" thì sẽ bỏ qua check VPN. */
+const VPN_API_KEY = "YOUR_VPN_API_KEY";  // <--- CHỈNH NẾU CÓ API KEY
 
-function generateKey() {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    let raw = "";
-    for (let i = 0; i < 16; i++) raw += chars[Math.floor(Math.random() * chars.length)];
-    return `${raw.slice(0,4)}-${raw.slice(4,8)}-${raw.slice(8,12)}-${raw.slice(12)}`;
+/* ========================
+    3. Helpers
+======================== */
+
+function formatRemain(expireMillis) {
+    const now = Date.now();
+    let remain = expireMillis - now;
+    if (remain < 0) remain = 0;
+
+    const totalMinutes = Math.floor(remain / (60 * 1000));
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    return `${TEXT.remain_prefix[lang]} ${hours} ${TEXT.remain_hours[lang]} ${minutes} ${TEXT.remain_minutes[lang]}`;
 }
 
-/* ============ MAIN LOGIC ============ */
+function generateKeyPlain() {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let raw = "";
+    for (let i = 0; i < 16; i++) {
+        raw += chars[Math.floor(Math.random() * chars.length)];
+    }
+    // Ví dụ: VQjC-7qOx-k9hB-mtgZ
+    return `${raw.slice(0,4)}-${raw.slice(4,8)}-${raw.slice(8,12)}-${raw.slice(12,16)}`;
+}
 
-async function main() {
-    const title = document.getElementById("title");
-    const loader = document.getElementById("loader");
-    const tick = document.getElementById("tick");
+// Hash SHA-256 cho key (lưu ở /keys)
+async function sha256(text) {
+    const enc = new TextEncoder().encode(text);
+    const buf = await crypto.subtle.digest("SHA-256", enc);
+    return Array.from(new Uint8Array(buf))
+        .map(b => b.toString(16).padStart(2, "0"))
+        .join("");
+}
+
+/* DevTools detect – nếu mở F12 / Inspect thì khóa luôn */
+function setupDevtoolsGuard() {
     const keyBox = document.getElementById("key");
     const msg = document.getElementById("msg");
-    const copyBtn = document.getElementById("copy");
-    const expireBox = document.getElementById("expire");
+    const statusIcon = document.getElementById("statusIcon");
+    const statusText = document.getElementById("status");
 
-    title.textContent = TEXT.title[lang];
-    document.getElementById("status").textContent = TEXT.loading[lang];
+    let tripped = false;
+    const threshold = 160;
+
+    setInterval(() => {
+        if (tripped) return;
+        const widthDiff  = window.outerWidth - window.innerWidth;
+        const heightDiff = window.outerHeight - window.innerHeight;
+        if (widthDiff > threshold || heightDiff > threshold) {
+            tripped = true;
+            statusIcon.classList.add("done");
+            statusText.textContent = "DevTools blocked";
+            keyBox.textContent = "DEVTOOLS";
+            keyBox.classList.add("show", "error");
+            msg.textContent = TEXT.devtools_block[lang];
+            msg.classList.add("error", "show");
+        }
+    }, 1200);
+
+    // chặn một số hotkey hay dùng mở DevTools
+    window.addEventListener("keydown", (e) => {
+        if (
+            e.key === "F12" ||
+            (e.ctrlKey && e.shiftKey && ["I","J","C"].includes(e.key.toUpperCase()))
+        ) {
+            e.preventDefault();
+        }
+    });
+}
+
+/* ========================
+         4. Main
+======================== */
+
+async function main() {
+    const titleEl = document.getElementById("title");
+    const statusIcon = document.getElementById("statusIcon");
+    const statusText = document.getElementById("status");
+    const keyBox = document.getElementById("key");
+    const copyBtn = document.getElementById("copy");
+    const msg = document.getElementById("msg");
+    const expireLine = document.getElementById("expireLine");
+
+    titleEl.textContent = TEXT.title[lang];
+    statusText.textContent = TEXT.processing[lang];
+
+    setupDevtoolsGuard();
 
     const params = new URLSearchParams(window.location.search);
     const token = (params.get("token") || "").trim();
 
+    // Anti URL / token fake
     if (token !== REAL_TOKEN) {
         setTimeout(() => {
-            loader.style.display = "none";
-            tick.style.display = "block";
-
+            statusIcon.classList.add("done");
             keyBox.textContent = "ACCESS DENIED";
-            keyBox.classList.add("show");
-
-            msg.textContent = TEXT.denied[lang];
+            keyBox.classList.add("show", "error");
+            msg.textContent = TEXT.access_denied[lang];
             msg.classList.add("error", "show");
-        }, 2200);
+        }, 1600);
         return;
     }
 
+    // chờ 2.3s cho đẹp
     setTimeout(async () => {
         try {
-            const ip = await fetch("https://api.ipify.org?format=json").then(r => r.json()).then(d => d.ip);
-            const safe = ip.replace(/\./g, "_");
-
+            /* 1) Lấy IP thật */
+            const ipData = await fetch("https://api.ipify.org?format=json").then(r => r.json());
+            const ip = ipData.ip;
+            const safeIP = ip.replace(/\./g, "_");
             const now = Date.now();
-            const ipRef = ref(db, "ips/" + safe);
+
+            /* 2) Check ban IP */
+            const banSnap = await get(ref(db, "bans/" + safeIP));
+            if (banSnap.exists()) {
+                const ban = banSnap.val();
+                if (!ban.until || ban.until > now) {
+                    statusIcon.classList.add("done");
+                    keyBox.textContent = "BANNED";
+                    keyBox.classList.add("show", "error");
+                    msg.textContent = TEXT.banned[lang];
+                    msg.classList.add("error", "show");
+                    return;
+                }
+            }
+
+            /* 3) Optional: check VPN / Proxy */
+            if (VPN_API_KEY && VPN_API_KEY !== "YOUR_VPN_API_KEY") {
+                try {
+                    const vpnRes = await fetch(`https://vpnapi.io/api/${ip}?key=${VPN_API_KEY}`);
+                    if (vpnRes.ok) {
+                        const vpnInfo = await vpnRes.json();
+                        if (vpnInfo.security && (vpnInfo.security.vpn || vpnInfo.security.proxy)) {
+                            statusIcon.classList.add("done");
+                            keyBox.textContent = "VPN / PROXY";
+                            keyBox.classList.add("show", "error");
+                            msg.textContent = TEXT.vpn_block[lang];
+                            msg.classList.add("error", "show");
+                            return;
+                        }
+                    }
+                } catch (e) {
+                    // nếu lỗi API thì bỏ qua, không block
+                    console.warn("VPN check error:", e);
+                }
+            }
+
+            /* 4) Nếu IP đã có key còn hạn -> trả về key cũ (anti re-get) */
+            const ipRef = ref(db, "ips/" + safeIP);
             const snap = await get(ipRef);
 
-            if (snap.exists() && snap.val().expire > now) {
-                showKey(snap.val().key, snap.val().expire - now, true);
+            if (snap.exists() && snap.val().expire && snap.val().expire > now) {
+                const oldKey = snap.val().key;
+                const expire = snap.val().expire;
+
+                statusIcon.classList.add("done");
+                keyBox.textContent = oldKey;
+                keyBox.classList.add("show");
+                copyBtn.classList.add("show");
+
+                expireLine.textContent = formatRemain(expire);
+                msg.textContent = TEXT.already_taken[lang];
+                msg.classList.add("ok", "show");
                 return;
             }
 
-            const key = generateKey();
-            const expire = now + 86400000;
+            /* 5) Tạo key mới + hash lưu ở /keys (anti leak) */
+            const plainKey = generateKeyPlain();
+            const expire = now + 24 * 60 * 60 * 1000; // 24h
+            const keyHash = await sha256(plainKey);
 
-            await set(ipRef, { key, expire });
-            await set(ref(db, "keys/" + key), {
-                key,
-                expire,
+            // Lưu plain key theo IP (chỉ để trả lại user)
+            await set(ipRef, { key: plainKey, expire: expire });
+
+            // Lưu hash key dùng để Roblox verify
+            await set(ref(db, "keys/" + keyHash), {
+                hash: keyHash,
+                expire: expire,
                 used: false,
-                ip: safe
+                ip: safeIP
+                // HWID sẽ được bind ở script Roblox lần verify đầu tiên
             });
 
-            showKey(key, expire - now, false);
+            statusIcon.classList.add("done");
+            keyBox.textContent = plainKey;
+            keyBox.classList.add("show");
+            copyBtn.classList.add("show");
+
+            expireLine.textContent = formatRemain(expire);
+            msg.textContent = TEXT.key_valid[lang];
+            msg.classList.add("ok", "show");
 
         } catch (err) {
-            loader.style.display = "none";
+            console.error(err);
+            statusIcon.classList.add("done");
             keyBox.textContent = "ERROR";
-            keyBox.classList.add("show");
-
-            msg.textContent = TEXT.cannot[lang];
+            keyBox.classList.add("show", "error");
+            msg.textContent = TEXT.cannot_get[lang];
             msg.classList.add("error", "show");
         }
     }, 2300);
-
-    /* ============ FUNCTION: SHOW KEY ============ */
-
-    function showKey(key, leftTime, existed) {
-        loader.style.display = "none";
-        tick.style.display = "block";
-
-        const hrs = Math.floor(leftTime / 3600000);
-        const mins = Math.floor((leftTime % 3600000) / 60000);
-
-        keyBox.textContent = key;
-        keyBox.classList.add("show");
-
-        expireBox.textContent =
-            lang === "vi"
-                ? `Còn lại: ${hrs} giờ ${mins} phút`
-                : `Time left: ${hrs}h ${mins}m`;
-
-        expireBox.classList.add("show");
-
-        copyBtn.classList.add("show");
-
-        msg.textContent = existed ? TEXT.taken[lang] : TEXT.valid[lang];
-        msg.classList.add("ok", "show");
-    }
-
-    /* ============ COPY BUTTON ============ */
-
-    window.copyKey = function () {
-        const key = keyBox.textContent.trim();
-        if (!key || key === "ERROR" || key === "ACCESS DENIED") return;
-
-        navigator.clipboard.writeText(key);
-
-        copyBtn.classList.add("pulse");
-        setTimeout(() => copyBtn.classList.remove("pulse"), 350);
-
-        msg.textContent = TEXT.copied[lang];
-        msg.classList.remove("error");
-        msg.classList.add("ok", "show");
-    };
 }
 
 main();
+
+/* Copy key */
+window.copyKey = function () {
+    const key = document.getElementById("key").innerText.trim();
+    if (!key || key === "..." || key === "ERROR" || key === "ACCESS DENIED" || key === "DEVTOOLS" || key === "BANNED") return;
+
+    navigator.clipboard.writeText(key).then(() => {
+        const msg = document.getElementById("msg");
+        msg.textContent = TEXT.copied[lang];
+        msg.classList.remove("error");
+        msg.classList.add("ok", "show");
+    });
+};
 </script>
 </head>
 <body>
-
-<canvas id="stars"></canvas>
 
 <div class="card">
     <div class="logo"></div>
     <h1 id="title">CozyHub Key</h1>
 
-    <div id="loader" class="loader"></div>
-    <div id="tick" class="tick">✔</div>
-
-    <div class="status" id="status">Processing...</div>
+    <div id="statusIcon" class="status-icon"></div>
+    <div id="status" class="status-text">Processing...</div>
 
     <div id="key" class="keybox">...</div>
-    <div id="expire" class="expire"></div>
+    <div id="expireLine" class="expire-line"></div>
 
     <button id="copy" class="copy-btn" onclick="copyKey()">COPY</button>
     <div id="msg" class="msg"></div>
