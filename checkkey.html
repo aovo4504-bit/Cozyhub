@@ -2,97 +2,91 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Check Key</title>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
-
-/* ======================
-       FIREBASE CONFIG
-======================= */
-const firebaseConfig = {
-  apiKey: "AIzaSyA0NQVV4puksa_QzcqtQuQNCjmc_B9OIf4",
-  authDomain: "cozyhubkey.firebaseapp.com",
-  databaseURL: "https://cozyhubkey-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "cozyhubkey",
-  storageBucket: "cozyhubkey.appspot.com",
-  messagingSenderId: "1081463631644",
-  appId: "1:1081463631644:web:92c15e4b94375ecf1554d9"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-/* ======================
-       SHA-256 HASH
-======================= */
-async function sha256(str) {
-    const buf = new TextEncoder().encode(str);
-    const hash = await crypto.subtle.digest("SHA-256", buf);
-    return Array.from(new Uint8Array(hash))
-        .map(b => b.toString(16).padStart(2, "0"))
-        .join("");
-}
-
-/* ======================
-       CHECK KEY
-======================= */
-async function main() {
-    const params = new URLSearchParams(window.location.search);
-    const key = (params.get("key") || "").trim();
-
-    if (!key) {
-        document.body.innerText = "NO_KEY";
-        return;
+<title>CozyHub Key Verify</title>
+<style>
+    body {
+        margin: 0;
+        background: #0d1117;
+        font-family: 'Poppins', sans-serif;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
     }
-
-    // Hash key như trong Firebase bạn đang lưu
-    const hashed = await sha256(key);
-
-    const keyRef = ref(db, "keys/" + hashed);
-    const snap = await get(keyRef);
-
-    if (!snap.exists()) {
-        document.body.innerText = "INVALID";
-        return;
+    .box {
+        padding: 30px;
+        border-radius: 18px;
+        background: rgba(0,0,0,0.55);
+        width: 360px;
+        text-align: center;
+        box-shadow: 0 0 40px #00eaff55;
+        border: 1px solid #00eaff55;
     }
+    h1 { color: #00eaff; }
+</style>
 
-    const data = snap.val();
-    const now = Date.now();
-
-    // Hết hạn?
-    if (data.expire < now) {
-        document.body.innerText = "EXPIRED";
-        return;
-    }
-
-    // Đã dùng?
-    if (data.used === true) {
-        document.body.innerText = "USED";
-        return;
-    }
-
-    // Check IP đúng như bạn đã lưu trong DB
-    const ip = await fetch("https://api.ipify.org?format=json")
-        .then(r => r.json()).then(j => j.ip.replace(/\./g, "_"));
-
-    if (data.ip !== ip) {
-        document.body.innerText = "IP_MISMATCH";
-        return;
-    }
-
-    // Đánh dấu Used
-    await update(keyRef, { used: true });
-
-    // Trả kết quả
-    document.body.innerText = "OK";
-}
-
-main();
+<script>
+const API_URL = "https://cozyhub.aovo4504.workers.dev";
 </script>
 </head>
+
 <body>
-Checking...
+<div class="box">
+    <h1>Verify Key</h1>
+    <div id="result">Checking...</div>
+</div>
+
+<script>
+async function verify() {
+    const params = new URLSearchParams(window.location.search);
+    const key = params.get("key");
+    const hwid = params.get("hwid") || "none";
+
+    if (!key) {
+        document.getElementById("result").innerHTML = "NO KEY PROVIDED";
+        return;
+    }
+
+    const res = await fetch(`${API_URL}/verify?key=${encodeURIComponent(key)}&hwid=${hwid}`);
+    const json = await res.json();
+
+    let out = "";
+
+    switch (json.code) {
+        case "VALID":
+            out = "✅ KEY HỢP LỆ";
+            break;
+
+        case "INVALID_KEY":
+            out = "❌ KEY SAI";
+            break;
+
+        case "EXPIRED":
+            out = "⏳ KEY HẾT HẠN";
+            break;
+
+        case "USED":
+            out = "❌ KEY ĐÃ DÙNG (KHÔNG TRÙNG HWID)";
+            break;
+
+        case "IP_MISMATCH":
+            out = "🚫 KHÔNG ĐÚNG ĐỊA CHỈ IP ĐÃ TẠO KEY";
+            break;
+
+        case "HWID_MISMATCH":
+            out = "🚫 KHÔNG ĐÚNG HWID";
+            break;
+
+        default:
+            out = "❌ LỖI KIỂM TRA KEY";
+    }
+
+    document.getElementById("result").innerHTML = out;
+}
+
+verify();
+</script>
+
 </body>
 </html>
