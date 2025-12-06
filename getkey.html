@@ -7,119 +7,159 @@
 <style>
     body {
         margin: 0;
-        font-family: Arial, sans-serif;
-        background: #020817;
+        font-family: 'Poppins', sans-serif;
+        background: #0c0f17;
         height: 100vh;
         display: flex;
         justify-content: center;
         align-items: center;
-        color: white;
         overflow: hidden;
+        color: white;
     }
 
-    /* NỀN VŨ TRỤ */
-    #universe {
+    .bg {
         position: fixed;
         inset: 0;
-        width: 100vw;
-        height: 100vh;
-        z-index: -1;
+        background: radial-gradient(circle at top, #112233, #05070d 80%);
+        z-index: -2;
     }
 
-    /* CARD */
     .card {
-        background: rgba(0,0,0,0.55);
-        padding: 40px;
         width: 420px;
-        border-radius: 22px;
+        background: rgba(10, 14, 25, 0.88);
+        padding: 35px 30px;
+        border-radius: 26px;
         text-align: center;
-        box-shadow: 0 0 55px #00eaff;
+        box-shadow: 0 0 60px rgba(0, 255, 255, 0.28);
+        border: 1px solid rgba(0,255,255,0.2);
+    }
+
+    .logo {
+        width: 110px;
+        height: 110px;
+        margin: 0 auto 18px;
+        border-radius: 50%;
+        background: url('https://raw.githubusercontent.com/aovo4504-bit/Cozyhub/main/IMG_0830.png')
+            center/cover;
+        box-shadow: 0 0 25px #00eaff, 0 0 50px rgba(0,255,255,0.5);
     }
 
     h1 {
+        font-size: 32px;
+        margin: 10px 0 25px;
         color: #00eaff;
-        text-shadow: 0 0 15px #00eaff;
-        margin-bottom: 20px;
-        font-size: 30px;
+        text-shadow: 0 0 12px rgba(0,255,255,0.5);
     }
 
     .loader {
-        border: 6px solid #0e1e28;
-        border-top: 6px solid #00eaff;
+        border: 5px solid #18202c;
+        border-top: 5px solid #00eaff;
+        width: 48px;
+        height: 48px;
+        margin: 0 auto;
         border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        margin: 0 auto 12px;
-        animation: spin 1s linear infinite;
+        animation: spin 1.15s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg);} }
 
-    .progress-box {
-        margin-top: 5px;
-        background: #0e1e28;
-        height: 12px;
-        border-radius: 10px;
-        overflow: hidden;
-    }
-
-    .progress {
-        background: #00eaff;
-        height: 100%;
-        width: 0%;
-        animation: load 3s forwards;
-        box-shadow: 0 0 25px #00eaff;
-    }
-    @keyframes load { 100% { width: 100%; } }
-
-    .status-text {
-        margin-top: 12px;
+    .status {
+        margin-top: 15px;
+        opacity: 0.8;
         font-size: 15px;
     }
 
     .keybox {
-        margin-top: 18px;
+        margin-top: 22px;
         padding: 14px;
-        background: #000;
         border-radius: 12px;
-        box-shadow: inset 0 0 25px #00eaff;
-        font-size: 20px;
+        background: rgba(0,0,0,0.55);
+        font-size: 18px;
         min-height: 26px;
-        word-break: break-all;
+        letter-spacing: 1px;
+        text-align: center;
+        border: 1px solid rgba(0,255,255,0.35);
+        box-shadow: inset 0 0 22px rgba(0,255,255,0.35);
+        transition: 0.3s ease;
+        opacity: 0;
+        transform: translateY(10px);
     }
-    .keybox.error {
-        box-shadow: inset 0 0 22px #ff4d4d;
-        color: #ff4d4d;
-    }
+    .keybox.show { opacity: 1; transform: translateY(0); }
 
     .copy-btn {
         margin-top: 15px;
-        background: #00eaff;
-        padding: 14px;
-        border-radius: 10px;
+        padding: 12px 0;
         width: 100%;
-        border: none;
         font-weight: bold;
-        font-size: 16px;
+        border-radius: 10px;
+        border: none;
         cursor: pointer;
-        box-shadow: 0 0 30px #00eaff;
+        background: #00eaff;
+        color: #001015;
+        font-size: 16px;
+        box-shadow: 0 0 25px rgba(0,255,255,0.4);
+        transition: 0.25s;
+        opacity: 0;
+        transform: translateY(10px);
     }
+    .copy-btn.show { opacity: 1; transform: translateY(0); }
+    .copy-btn:hover { transform: scale(1.03); }
 
     .msg {
         margin-top: 12px;
-        color: #59ff91;
-        display: none;
         font-size: 14px;
+        opacity: 0;
+        transition: 0.3s;
     }
-    .msg.error {
-        color: #ff4d4d;
-        text-shadow: 0 0 10px #ff4d4d;
-    }
+    .msg.show { opacity: 1; }
+
+    .msg.error { color: #ff4d4d; }
+    .msg.ok { color: #59ff91; }
 </style>
 
-<!-- FIREBASE SCRIPT -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+/* ======================
+   AUTO LANGUAGE EN / VI
+====================== */
+
+const lang = (navigator.language || "en").startsWith("vi") ? "vi" : "en";
+
+const TEXT = {
+    title: {
+        vi: "CozyHub Key",
+        en: "CozyHub Key"
+    },
+    loading: {
+        vi: "Đang xử lý...",
+        en: "Processing..."
+    },
+    access_denied: {
+        vi: "Bạn chưa làm nhiệm vụ!",
+        en: "You haven't completed the task!"
+    },
+    already_taken: {
+        vi: "Bạn đã lấy key rồi.",
+        en: "You already claimed your key."
+    },
+    key_valid: {
+        vi: "Key hợp lệ 24 giờ.",
+        en: "Your key is valid for 24 hours."
+    },
+    cannot_get: {
+        vi: "Không thể lấy key!",
+        en: "Unable to fetch key!"
+    },
+    copied: {
+        vi: "Đã copy!",
+        en: "Copied!"
+    }
+};
+
+/* ======================
+        FIREBASE
+====================== */
 
 const firebaseConfig = {
   apiKey: "AIzaSyA0NQVV4puksa_QzcqtQuQNCjmc_B9OIf4",
@@ -134,166 +174,121 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
+// Token phải trùng Link4m
 const REAL_TOKEN = "COZYHUB_9d8293f2c18c4f0b9df3";
 
+/* KEY FORMAT XXXX-XXXX-XXXX-XXXX */
 function generateKey() {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    let k = "";
-    for (let i = 0; i < 40; i++) k += chars[Math.floor(Math.random() * chars.length)];
-    return k;
+    let raw = "";
+    for (let i = 0; i < 16; i++) {
+        raw += chars[Math.floor(Math.random() * chars.length)];
+    }
+    // format 4-4-4-4
+    return `${raw.slice(0,4)}-${raw.slice(4,8)}-${raw.slice(8,12)}-${raw.slice(12,16)}`;
 }
 
 async function main() {
+    document.getElementById("status").textContent = TEXT.loading[lang];
+    document.getElementById("title").textContent = TEXT.title[lang];
+
     const params = new URLSearchParams(window.location.search);
-    let token = (params.get("token") || params.get("code") || "").trim();
+    const token = (params.get("token") || "").trim();
 
     const keyBox = document.getElementById("key");
     const msg = document.getElementById("msg");
-    const status = document.getElementById("status");
+    const copyBtn = document.getElementById("copy");
 
     if (token !== REAL_TOKEN) {
         setTimeout(() => {
-            keyBox.classList.add("error");
-            keyBox.textContent = "Bạn chưa làm nhiệm vụ!";
-            msg.classList.add("error");
-            msg.textContent = "Hãy quay lại Link4m để làm nhiệm vụ.";
-            msg.style.display = "block";
-        }, 3000);
+            keyBox.textContent = "ACCESS DENIED";
+            keyBox.classList.add("show");
+            msg.textContent = TEXT.access_denied[lang];
+            msg.classList.add("error", "show");
+        }, 2000);
         return;
     }
 
     setTimeout(async () => {
         try {
-            status.textContent = "Đang kiểm tra key...";
+            const ip = await fetch("https://api.ipify.org?format=json")
+                .then(r => r.json()).then(d => d.ip);
 
-            const ip = await fetch("https://api.ipify.org?format=json").then(r => r.json()).then(d => d.ip);
             const safeIP = ip.replace(/\./g, "_");
-
             const ipRef = ref(db, "ips/" + safeIP);
-
-            let snap = await get(ipRef).catch(() => null);
+            const snap = await get(ipRef);
             const now = Date.now();
 
-            if (snap && snap.exists() && snap.val().expire > now) {
-                const oldKey = snap.val().key || null;
+            // Nếu có key còn hạn -> trả lại key cũ
+            if (snap.exists() && snap.val().expire > now) {
+                const oldKey = snap.val().key;
+                keyBox.textContent = oldKey;
+                keyBox.classList.add("show");
+                copyBtn.classList.add("show");
 
-                if (oldKey) {
-                    keyBox.textContent = oldKey;
-                    msg.textContent = "Bạn đã lấy key rồi (còn hạn).";
-                    msg.style.display = "block";
-                    status.textContent = "Hoàn tất.";
-                    return;
-                }
+                msg.textContent = TEXT.already_taken[lang];
+                msg.classList.add("ok", "show");
+                return;
             }
 
+            // Tạo key mới
             const key = generateKey();
             const expire = now + 24 * 60 * 60 * 1000;
 
             await set(ipRef, { key, expire });
-
             await set(ref(db, "keys/" + key), {
-                expire: expire,
+                key,
+                expire,
                 used: false,
                 ip: safeIP
             });
 
             keyBox.textContent = key;
-            msg.textContent = "Key mới tạo – có hạn 24h.";
-            msg.style.display = "block";
-            status.textContent = "Hoàn tất.";
+            keyBox.classList.add("show");
+            copyBtn.classList.add("show");
+
+            msg.textContent = TEXT.key_valid[lang];
+            msg.classList.add("ok", "show");
 
         } catch (err) {
-            keyBox.classList.add("error");
-            keyBox.textContent = "Lỗi hệ thống!";
-            msg.classList.add("error");
-            msg.textContent = "Không lấy được key.";
-            msg.style.display = "block";
-            status.textContent = "Lỗi.";
+            console.error(err);
+            keyBox.textContent = "ERROR";
+            keyBox.classList.add("show");
+            msg.textContent = TEXT.cannot_get[lang];
+            msg.classList.add("error", "show");
         }
-    }, 3000);
+    }, 2300);
 }
 
 main();
 
 window.copyKey = function () {
     const key = document.getElementById("key").innerText.trim();
-    if (!key || key === "...") return;
+    if (!key || key === "..." || key === "ERROR" || key === "ACCESS DENIED") return;
 
-    navigator.clipboard.writeText(key).then(() => {
-        const msg = document.getElementById("msg");
-        msg.classList.remove("error");
-        msg.textContent = "Đã copy Key!";
-        msg.style.display = "block";
-    });
-}
+    navigator.clipboard.writeText(key);
+    const msg = document.getElementById("msg");
+    msg.textContent = TEXT.copied[lang];
+    msg.classList.remove("error");
+    msg.classList.add("ok", "show");
+};
 </script>
-
 </head>
 <body>
 
-<canvas id="universe"></canvas>
+<div class="bg"></div>
 
 <div class="card">
-    <h1>CozyHub Key</h1>
+    <div class="logo"></div>
+    <h1 id="title">CozyHub Key</h1>
 
-    <div id="loadingBox">
-        <div class="loader"></div>
-        <div class="progress-box"><div class="progress"></div></div>
-        <p class="status-text" id="status">Đang xử lý nhiệm vụ...</p>
-    </div>
+    <div class="loader"></div>
+    <div class="status" id="status">Processing...</div>
 
-    <div id="keyBox">
-        <div class="keybox" id="key">...</div>
-        <button class="copy-btn" onclick="copyKey()">COPY KEY</button>
-        <div class="msg" id="msg"></div>
-    </div>
+    <div id="key" class="keybox">...</div>
+    <button id="copy" class="copy-btn" onclick="copyKey()">COPY</button>
+    <div id="msg" class="msg"></div>
 </div>
-
-<!-- SCRIPT NỀN VŨ TRỤ -->
-<script>
-const canvas = document.getElementById('universe');
-const ctx = canvas.getContext('2d');
-
-let w, h;
-function resize() {
-    w = canvas.width = window.innerWidth;
-    h = canvas.height = window.innerHeight;
-}
-resize();
-window.addEventListener("resize", resize);
-
-let stars = [];
-let count = 350;
-
-for (let i = 0; i < count; i++) {
-    stars.push({
-        x: Math.random() * w,
-        y: Math.random() * h,
-        z: Math.random() * 3 + 1
-    });
-}
-
-function animate() {
-    ctx.clearRect(0, 0, w, h);
-    ctx.fillStyle = "white";
-
-    for (let s of stars) {
-        let speed = s.z * 0.7;
-
-        s.y += speed;
-        if (s.y > h) {
-            s.y = 0; s.x = Math.random() * w;
-        }
-
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.z, 0, Math.PI * 2);
-        ctx.fill();
-    }
-
-    requestAnimationFrame(animate);
-}
-animate();
-</script>
 
 </body>
 </html>
