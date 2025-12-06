@@ -8,9 +8,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
-/* =====================================
-      FIREBASE CONFIG GIỮ NGUYÊN
-===================================== */
+/* ======================
+       FIREBASE CONFIG
+======================= */
 const firebaseConfig = {
   apiKey: "AIzaSyA0NQVV4puksa_QzcqtQuQNCjmc_B9OIf4",
   authDomain: "cozyhubkey.firebaseapp.com",
@@ -24,9 +24,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-/* =====================================
-     SHA-256 HASH (vì key lưu dạng hash)
-===================================== */
+/* ======================
+       SHA-256 HASH
+======================= */
 async function sha256(str) {
     const buf = new TextEncoder().encode(str);
     const hash = await crypto.subtle.digest("SHA-256", buf);
@@ -35,17 +35,9 @@ async function sha256(str) {
         .join("");
 }
 
-/* =====================================
-       LẤY HWID BẰNG TRÌNH DUYỆT
-===================================== */
-async function getHWID() {
-    const data = navigator.userAgent + navigator.platform;
-    return sha256(data);
-}
-
-/* =====================================
-           CHECK KEY CHÍNH
-===================================== */
+/* ======================
+       CHECK KEY
+======================= */
 async function main() {
     const params = new URLSearchParams(window.location.search);
     const key = (params.get("key") || "").trim();
@@ -55,10 +47,10 @@ async function main() {
         return;
     }
 
-    // Hash key để check Firebase
-    const hash = await sha256(key);
+    // Hash key như trong Firebase bạn đang lưu
+    const hashed = await sha256(key);
 
-    const keyRef = ref(db, "keys/" + hash);
+    const keyRef = ref(db, "keys/" + hashed);
     const snap = await get(keyRef);
 
     if (!snap.exists()) {
@@ -69,19 +61,19 @@ async function main() {
     const data = snap.val();
     const now = Date.now();
 
-    // 1. Expired?
+    // Hết hạn?
     if (data.expire < now) {
         document.body.innerText = "EXPIRED";
         return;
     }
 
-    // 2. Used?
+    // Đã dùng?
     if (data.used === true) {
         document.body.innerText = "USED";
         return;
     }
 
-    // 3. IP Lock
+    // Check IP đúng như bạn đã lưu trong DB
     const ip = await fetch("https://api.ipify.org?format=json")
         .then(r => r.json()).then(j => j.ip.replace(/\./g, "_"));
 
@@ -90,20 +82,10 @@ async function main() {
         return;
     }
 
-    // 4. HWID Lock (auto bind first time)
-    const hwid = await getHWID();
-
-    if (!data.hwid) {
-        await update(keyRef, { hwid: hwid });
-    } else if (data.hwid !== hwid) {
-        document.body.innerText = "HWID_MISMATCH";
-        return;
-    }
-
-    // 5. Đánh dấu đã dùng
+    // Đánh dấu Used
     await update(keyRef, { used: true });
 
-    // 6. Trả kết quả
+    // Trả kết quả
     document.body.innerText = "OK";
 }
 
