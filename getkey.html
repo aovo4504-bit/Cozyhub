@@ -7,185 +7,169 @@
 <style>
     body {
         margin: 0;
-        font-family: 'Poppins', sans-serif;
-        background: #020817;
+        background: #0d1117;
         height: 100vh;
         display: flex;
         justify-content: center;
         align-items: center;
+        font-family: 'Poppins', sans-serif;
         color: white;
-        overflow: hidden;
-    }
-
-    .stars {
-        position: absolute;
-        inset: 0;
-        background: url('https://raw.githubusercontent.com/aovo4504-bit/Cozyhub/main/starsbg.gif');
-        background-size: cover;
-        z-index: -1;
     }
 
     .card {
-        background: rgba(0, 0, 0, 0.55);
-        padding: 40px;
         width: 420px;
-        border-radius: 22px;
+        background: rgba(0,0,0,0.55);
+        padding: 35px 28px;
+        border-radius: 25px;
         text-align: center;
-        box-shadow: 0 0 55px #00eaff;
+        box-shadow: 0 0 55px #00eaff88;
+        border: 1px solid #00eaff55;
     }
 
     .logo {
-        width: 130px;
-        height: 130px;
-        margin: 0 auto 20px;
+        width: 105px;
+        height: 105px;
+        background: url('https://raw.githubusercontent.com/aovo4504-bit/Cozyhub/main/IMG_0830.png') center/cover;
+        margin: 0 auto 18px;
         border-radius: 50%;
-        background: url('https://raw.githubusercontent.com/aovo4504-bit/Cozyhub/refs/heads/main/IMG_0830.png') center/cover;
-        box-shadow: 0 0 35px #00eaff, 0 0 60px #00eaff;
+        box-shadow: 0 0 25px #00eaffaa;
     }
 
     h1 {
         color: #00eaff;
-        text-shadow: 0 0 15px #00eaff;
+        font-size: 30px;
+        text-shadow: 0 0 12px #00eaff;
         margin-bottom: 20px;
-        font-size: 28px;
     }
 
     .loader {
-        border: 6px solid #0e1e28;
-        border-top: 6px solid #00eaff;
-        border-radius: 50%;
+        margin: 0 auto 15px;
         width: 50px;
         height: 50px;
-        margin: 0 auto 15px;
+        border: 5px solid #1a252f;
+        border-top: 5px solid #00eaff;
+        border-radius: 50%;
         animation: spin 1s linear infinite;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes spin { to { transform: rotate(360deg);} }
 
     .status {
-        margin-top: 10px;
-        font-size: 14px;
-        opacity: 0.85;
+        opacity: 0.8;
+        margin-bottom: 20px;
     }
 
     .keybox {
-        margin-top: 20px;
-        padding: 14px;
-        background: #000;
-        border-radius: 12px;
-        box-shadow: inset 0 0 25px #00eaff;
-        font-size: 20px;
-        min-height: 28px;
-        word-break: break-all;
-        letter-spacing: 1px;
         opacity: 0;
-        transition: 0.4s;
+        transform: translateY(10px);
+        transition: .3s;
+        padding: 12px;
+        font-size: 18px;
+        background: rgba(0,0,0,0.55);
+        border-radius: 10px;
+        border: 1px solid #00eaff88;
+        box-shadow: inset 0 0 18px #00eaff55;
+        margin-bottom: 12px;
     }
-    .keybox.show { opacity: 1; }
+    .keybox.show { opacity: 1; transform: translateY(0); }
 
     .copy-btn {
-        margin-top: 15px;
-        background: #00eaff;
-        padding: 14px;
-        border-radius: 10px;
         width: 100%;
+        padding: 12px 0;
+        background: #00eaff;
         border: none;
+        border-radius: 10px;
         font-weight: bold;
         font-size: 16px;
         cursor: pointer;
+        color: #00161d;
         opacity: 0;
-        transition: 0.4s;
+        transform: translateY(10px);
+        transition: .3s;
     }
-    .copy-btn.show { opacity: 1; }
+    .copy-btn.show { opacity: 1; transform: translateY(0); }
+    .copy-btn:hover { transform: scale(1.04); }
 
     .msg {
+        color: #59ff91;
         margin-top: 12px;
-        font-size: 14px;
-        transition: 0.3s;
+        opacity: 0;
+        transition: .3s;
     }
-    .msg.ok { color: #59ff91; }
-    .msg.error { color: #ff4d4d; }
+    .msg.show { opacity: 1; }
 </style>
-</head>
-
-<body>
-
-<div class="stars"></div>
-
-<div class="card">
-
-    <div class="logo"></div>
-
-    <h1>CozyHub Key</h1>
-
-    <div class="loader"></div>
-    <div class="status" id="status">Đang lấy key...</div>
-
-    <div class="keybox" id="key">...</div>
-
-    <button class="copy-btn" id="copyBtn" onclick="copyKey()">COPY KEY</button>
-
-    <div class="msg" id="msg"></div>
-</div>
 
 <script>
 const API_URL = "https://cozyhub.aovo4504.workers.dev";
 
-const keyBox = document.getElementById("key");
-const msg = document.getElementById("msg");
-const status = document.getElementById("status");
-const btn = document.getElementById("copyBtn");
+const lang = navigator.language.startsWith("vi") ? "vi" : "en";
 
-const lang = (navigator.language || "en").startsWith("vi") ? "vi" : "en";
 const TEXT = {
-    loading: { vi: "Đang lấy key...", en: "Fetching key..." },
-    got_new: { vi: "Tạo key mới thành công!", en: "New key generated!" },
-    got_old: { vi: "Bạn đã lấy key rồi (còn hạn).", en: "You already have a valid key." },
-    expire: { vi: "Key hết hạn lúc: ", en: "Expires at: " },
-    copied: { vi: "Đã copy!", en: "Copied!" },
-    error: { vi: "Lỗi server, thử lại sau!", en: "Server error, try again!" }
+    loading: { vi: "Đang xử lý...", en: "Processing..." },
+    copied:  { vi: "Đã copy key!", en: "Copied!" },
+    reused:  { vi: "Bạn đã lấy key rồi.", en: "Key already claimed." },
+    newkey:  { vi: "Key hợp lệ 24 giờ.", en: "Your key is valid for 24 hours." },
 };
+</script>
 
-status.textContent = TEXT.loading[lang];
+</head>
+<body>
 
-// FETCH KEY FROM API
-async function loadKey() {
-    try {
-        const res = await fetch(API_URL + "/claim");
-        const data = await res.json();
+<div class="card">
+    <div class="logo"></div>
+    <h1>CozyHub Key</h1>
 
-        if (!data.key) throw 0;
+    <div class="loader"></div>
+    <div id="status" class="status">Processing...</div>
 
-        keyBox.textContent = data.key;
-        keyBox.classList.add("show");
+    <div id="keybox" class="keybox">...</div>
+    <button id="copy" class="copy-btn" onclick="copyKey()">COPY</button>
 
-        btn.classList.add("show");
+    <div id="msg" class="msg"></div>
+</div>
 
-        const exp = new Date(data.expire).toLocaleString();
-        msg.textContent = TEXT.expire[lang] + exp;
-        msg.classList.add("ok");
+<script>
+async function fetchKey() {
+    document.getElementById("status").textContent = TEXT.loading[lang];
 
-        status.textContent = data.reused
-            ? TEXT.got_old[lang]
-            : TEXT.got_new[lang];
+    const res = await fetch(`${API_URL}/claim`);
+    const json = await res.json();
 
-    } catch (e) {
-        keyBox.textContent = "ERROR";
-        keyBox.classList.add("show");
-        msg.textContent = TEXT.error[lang];
-        msg.classList.add("error");
-        status.textContent = TEXT.error[lang];
+    const keybox = document.getElementById("keybox");
+    const copyBtn = document.getElementById("copy");
+    const msg = document.getElementById("msg");
+
+    if (json.status !== "OK") {
+        keybox.textContent = "ERROR";
+        keybox.classList.add("show");
+        return;
     }
+
+    keybox.textContent = json.key;
+    keybox.classList.add("show");
+    copyBtn.classList.add("show");
+
+    const remaining = Math.floor((json.expire - Date.now()) / 1000);
+
+    const h = Math.floor(remaining / 3600);
+    const m = Math.floor((remaining % 3600) / 60);
+
+    msg.innerHTML =
+        (json.reused ? TEXT.reused[lang] : TEXT.newkey[lang]) +
+        `<br>Còn lại: ${h} giờ ${m} phút`;
+
+    msg.classList.add("show");
 }
-loadKey();
 
 function copyKey() {
-    const key = keyBox.textContent.trim();
-    if (!key || key === "ERROR") return;
-
+    const key = document.getElementById("keybox").innerText;
     navigator.clipboard.writeText(key);
+
+    const msg = document.getElementById("msg");
     msg.textContent = TEXT.copied[lang];
-    msg.className = "msg ok";
+    msg.classList.add("show");
 }
+
+fetchKey();
 </script>
 
 </body>
