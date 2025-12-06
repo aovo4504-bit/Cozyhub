@@ -8,6 +8,33 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
+/* Auto language */
+const lang = (navigator.language || "en").startsWith("vi") ? "vi" : "en";
+
+const TEXT = {
+    no_key: {
+        vi: "Không có key!",
+        en: "No key provided!"
+    },
+    invalid: {
+        vi: "Key không tồn tại!",
+        en: "Key does not exist!"
+    },
+    expired: {
+        vi: "Key đã hết hạn!",
+        en: "Key has expired!"
+    },
+    used: {
+        vi: "Key đã được sử dụng!",
+        en: "Key already used!"
+    },
+    ok: {
+        vi: "Key hợp lệ!",
+        en: "Key valid!"
+    }
+};
+
+/* Firebase config */
 const firebaseConfig = {
   apiKey: "AIzaSyA0NQVV4puksa_QzcqtQuQNCjmc_B9OIf4",
   authDomain: "cozyhubkey.firebaseapp.com",
@@ -21,19 +48,14 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-function t(vi, en) {
-    const lang = navigator.language || "en";
-    return lang.startsWith("vi") ? vi : en;
-}
-
-async function checkKey() {
+async function run() {
     const params = new URLSearchParams(window.location.search);
-    const key = params.get("key");
+    const key = (params.get("key") || "").trim();
 
     if (!key) {
         document.body.innerText = JSON.stringify({
             status: "NO_KEY",
-            message: t("Không có key!", "No key provided!")
+            message: TEXT.no_key[lang]
         });
         return;
     }
@@ -44,7 +66,7 @@ async function checkKey() {
     if (!snap.exists()) {
         document.body.innerText = JSON.stringify({
             status: "INVALID",
-            message: t("Key không hợp lệ!", "Invalid key!")
+            message: TEXT.invalid[lang]
         });
         return;
     }
@@ -55,7 +77,7 @@ async function checkKey() {
     if (!data.expire || data.expire < now) {
         document.body.innerText = JSON.stringify({
             status: "EXPIRED",
-            message: t("Key đã hết hạn!", "Your key has expired!")
+            message: TEXT.expired[lang]
         });
         return;
     }
@@ -63,25 +85,24 @@ async function checkKey() {
     if (data.used === true) {
         document.body.innerText = JSON.stringify({
             status: "USED",
-            message: t("Key đã được sử dụng!", "Key already used!")
+            message: TEXT.used[lang]
         });
         return;
     }
 
-    // Đánh dấu used (không ghi đè dữ liệu khác)
+    // đánh dấu đã dùng, không xóa dữ liệu khác
     await update(keyRef, { used: true });
 
     document.body.innerText = JSON.stringify({
         status: "OK",
-        message: t("Key hợp lệ! Bạn có thể dùng script.", "Key valid! You may run the script.")
+        message: TEXT.ok[lang]
     });
 }
 
-checkKey();
+run();
 </script>
-
 </head>
 <body>
-Checking key...
+Checking...
 </body>
 </html>
