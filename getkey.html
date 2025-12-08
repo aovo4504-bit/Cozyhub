@@ -7,170 +7,492 @@
 <style>
     body {
         margin: 0;
-        background: #0d1117;
+        font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        background: #050811;
         height: 100vh;
         display: flex;
         justify-content: center;
         align-items: center;
-        font-family: 'Poppins', sans-serif;
-        color: white;
+        overflow: hidden;
+        color: #ffffff;
+    }
+
+    .bg {
+        position: fixed;
+        inset: 0;
+        background:
+            radial-gradient(circle at top, #151b2b 0, #050811 55%, #02040a 100%);
+        z-index: -2;
     }
 
     .card {
-        width: 420px;
-        background: rgba(0,0,0,0.55);
-        padding: 35px 28px;
-        border-radius: 25px;
+        width: 430px;
+        max-width: 92vw;
+        background: rgba(7, 11, 20, 0.92);
+        padding: 34px 30px 30px;
+        border-radius: 26px;
         text-align: center;
-        box-shadow: 0 0 55px #00eaff88;
-        border: 1px solid #00eaff55;
+        box-shadow:
+            0 0 45px rgba(0, 255, 255, 0.25),
+            0 0 90px rgba(0, 255, 255, 0.12);
+        border: 1px solid rgba(0,255,255,0.25);
     }
 
     .logo {
-        width: 105px;
-        height: 105px;
-        background: url('https://raw.githubusercontent.com/aovo4504-bit/Cozyhub/main/IMG_0830.png') center/cover;
-        margin: 0 auto 18px;
+        width: 110px;
+        height: 110px;
+        margin: 0 auto 16px;
         border-radius: 50%;
-        box-shadow: 0 0 25px #00eaffaa;
+        background: url('https://raw.githubusercontent.com/aovo4504-bit/Cozyhub/refs/heads/main/IMG_0830.png')
+            center/cover;
+        box-shadow:
+            0 0 18px #00eaff,
+            0 0 40px rgba(0,255,255,0.7);
     }
 
     h1 {
+        font-size: 32px;
+        margin: 6px 0 18px;
         color: #00eaff;
-        font-size: 30px;
-        text-shadow: 0 0 12px #00eaff;
-        margin-bottom: 20px;
+        letter-spacing: 0.5px;
+        text-shadow:
+            0 0 10px rgba(0,255,255,0.6),
+            0 0 18px rgba(0,255,255,0.35);
+    }
+
+    .loader-wrap {
+        margin-top: 4px;
+        margin-bottom: 14px;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .loader {
-        margin: 0 auto 15px;
-        width: 50px;
-        height: 50px;
-        border: 5px solid #1a252f;
+        border: 5px solid #18202c;
         border-top: 5px solid #00eaff;
+        width: 46px;
+        height: 46px;
         border-radius: 50%;
-        animation: spin 1s linear infinite;
+        animation: spin 1.1s linear infinite;
     }
+
+    .loader.done {
+        border-color: transparent;
+        border-top-color: transparent;
+        background: none;
+        position: relative;
+    }
+
+    .loader.done::before {
+        content: "✓";
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        color: #00ff9d;
+        text-shadow: 0 0 14px rgba(0,255,157,0.85);
+    }
+
     @keyframes spin { to { transform: rotate(360deg);} }
 
     .status {
+        margin-top: 4px;
+        font-size: 14px;
         opacity: 0.8;
-        margin-bottom: 20px;
     }
 
     .keybox {
-        opacity: 0;
-        transform: translateY(10px);
-        transition: .3s;
-        padding: 12px;
+        margin-top: 22px;
+        padding: 13px 14px;
+        border-radius: 12px;
+        background: rgba(0, 0, 0, 0.7);
         font-size: 18px;
-        background: rgba(0,0,0,0.55);
-        border-radius: 10px;
-        border: 1px solid #00eaff88;
-        box-shadow: inset 0 0 18px #00eaff55;
-        margin-bottom: 12px;
+        min-height: 26px;
+        letter-spacing: 1px;
+        text-align: center;
+        border: 1px solid rgba(0,255,255,0.4);
+        box-shadow: inset 0 0 22px rgba(0,255,255,0.35);
+        transition: 0.28s ease;
+        opacity: 0;
+        transform: translateY(8px);
+        word-break: break-all;
     }
     .keybox.show { opacity: 1; transform: translateY(0); }
 
+    .time-left {
+        margin-top: 10px;
+        font-size: 13px;
+        opacity: 0.85;
+    }
+
     .copy-btn {
-        width: 100%;
+        margin-top: 18px;
         padding: 12px 0;
-        background: #00eaff;
-        border: none;
+        width: 100%;
+        font-weight: 600;
         border-radius: 10px;
-        font-weight: bold;
-        font-size: 16px;
+        border: none;
         cursor: pointer;
-        color: #00161d;
+        background: #00eaff;
+        color: #001015;
+        font-size: 16px;
+        box-shadow: 0 0 24px rgba(0,255,255,0.5);
+        transition: 0.22s;
         opacity: 0;
-        transform: translateY(10px);
-        transition: .3s;
+        transform: translateY(8px);
     }
     .copy-btn.show { opacity: 1; transform: translateY(0); }
-    .copy-btn:hover { transform: scale(1.04); }
+    .copy-btn:hover { transform: translateY(0) scale(1.03); }
 
     .msg {
-        color: #59ff91;
-        margin-top: 12px;
+        margin-top: 10px;
+        font-size: 13px;
         opacity: 0;
-        transition: .3s;
+        transition: 0.25s;
     }
     .msg.show { opacity: 1; }
+
+    .msg.ok { color: #78ff9f; }
+    .msg.error { color: #ff5b5b; }
+
+    .small {
+        margin-top: 6px;
+        font-size: 11px;
+        opacity: 0.5;
+    }
 </style>
 
-<script>
-const API_URL = "https://cozyhub.aovo4504.workers.dev";
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
-const lang = navigator.language.startsWith("vi") ? "vi" : "en";
+/* ======================
+   AUTO LANG (VI / EN)
+====================== */
+const lang = (navigator.language || "en").toLowerCase().startsWith("vi") ? "vi" : "en";
 
 const TEXT = {
-    loading: { vi: "Đang xử lý...", en: "Processing..." },
-    copied:  { vi: "Đã copy key!", en: "Copied!" },
-    reused:  { vi: "Bạn đã lấy key rồi.", en: "Key already claimed." },
-    newkey:  { vi: "Key hợp lệ 24 giờ.", en: "Your key is valid for 24 hours." },
+    title: { vi: "CozyHub Key", en: "CozyHub Key" },
+    processing: { vi: "Đang xử lý...", en: "Processing..." },
+    checking:   { vi: "Đang kiểm tra key...", en: "Checking key..." },
+    done:       { vi: "Hoàn tất.", en: "Done." },
+
+    access_denied: {
+        vi: "Bạn chưa làm nhiệm vụ.",
+        en: "You haven't completed the tasks."
+    },
+    need_two_tasks: {
+        vi: "Bạn phải hoàn thành đủ 2 nhiệm vụ để lấy key.",
+        en: "You must complete both tasks to get a key."
+    },
+    rate_limit: {
+        vi: "Bạn thao tác quá nhanh, thử lại sau ít phút.",
+        en: "You are doing this too fast, please try again later."
+    },
+    banned: {
+        vi: "IP của bạn tạm thời bị chặn do nghi ngờ spam.",
+        en: "Your IP is temporarily blocked due to suspected abuse."
+    },
+    already_taken: {
+        vi: "Bạn đã lấy key rồi.",
+        en: "You already claimed a key."
+    },
+    key_valid_24h: {
+        vi: "Key hợp lệ trong 24 giờ.",
+        en: "Key is valid for 24 hours."
+    },
+    system_error: {
+        vi: "Lỗi hệ thống, hãy thử lại sau.",
+        en: "System error, please try again later."
+    },
+    copied: {
+        vi: "Đã copy key!",
+        en: "Key copied!"
+    },
+    time_left_prefix: {
+        vi: "Còn lại:",
+        en: "Time left:"
+    }
 };
-</script>
 
-</head>
-<body>
+/* ======================
+       FIREBASE CONFIG
+====================== */
+const firebaseConfig = {
+  apiKey: "AIzaSyA0NQVV4puksa_QzcqtQuQNCjmc_B9OIf4",
+  authDomain: "cozyhubkey.firebaseapp.com",
+  databaseURL: "https://cozyhubkey-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "cozyhubkey",
+  storageBucket: "cozyhubkey.appspot.com",
+  messagingSenderId: "1081463631644",
+  appId: "1:1081463631644:web:92c15e4b94375ecf1554d9"
+};
 
-<div class="card">
-    <div class="logo"></div>
-    <h1>CozyHub Key</h1>
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
-    <div class="loader"></div>
-    <div id="status" class="status">Processing...</div>
+/* ========== Utility ========== */
+function setStatus(textKey) {
+    document.getElementById("status").textContent = TEXT[textKey][lang];
+}
 
-    <div id="keybox" class="keybox">...</div>
-    <button id="copy" class="copy-btn" onclick="copyKey()">COPY</button>
-
-    <div id="msg" class="msg"></div>
-</div>
-
-<script>
-async function fetchKey() {
-    document.getElementById("status").textContent = TEXT.loading[lang];
-
-    const res = await fetch(`${API_URL}/claim`);
-    const json = await res.json();
-
-    const keybox = document.getElementById("keybox");
-    const copyBtn = document.getElementById("copy");
+function setMsg(type, textKey) {
     const msg = document.getElementById("msg");
+    msg.className = "msg show " + (type === "error" ? "error" : "ok");
+    msg.textContent = TEXT[textKey][lang];
+}
 
-    if (json.status !== "OK") {
-        keybox.textContent = "ERROR";
-        keybox.classList.add("show");
+function formatRemaining(ms) {
+    if (ms <= 0) return lang === "vi" ? "hết hạn" : "expired";
+    const totalSec = Math.floor(ms / 1000);
+    const h = Math.floor(totalSec / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    if (lang === "vi") {
+        return `${TEXT.time_left_prefix[lang]} ${h} giờ ${m} phút`;
+    } else {
+        return `${TEXT.time_left_prefix[lang]} ${h}h ${m}m`;
+    }
+}
+
+/*  KEY FORMAT: XXXX-XXXX-XXXX-XXXX */
+function generateKey() {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let raw = "";
+    for (let i = 0; i < 16; i++) {
+        raw += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return `${raw.slice(0,4)}-${raw.slice(4,8)}-${raw.slice(8,12)}-${raw.slice(12,16)}`;
+}
+
+/* SHA-256 cho việc lưu HASH như hub lớn */
+async function sha256(str) {
+    const buf = new TextEncoder().encode(str);
+    const hash = await crypto.subtle.digest("SHA-256", buf);
+    return Array.from(new Uint8Array(hash))
+        .map(b => b.toString(16).padStart(2, "0"))
+        .join("");
+}
+
+/* ========== MAIN LOGIC ========== */
+async function main() {
+    document.getElementById("title").textContent = TEXT.title[lang];
+    setStatus("processing");
+
+    const params = new URLSearchParams(window.location.search);
+
+    // Lấy token nhiệm vụ 1 & 2 từ URL hoặc localStorage
+    let t1 = params.get("t1") || localStorage.getItem("cozy_task1") || "";
+    let t2 = params.get("t2") || localStorage.getItem("cozy_task2") || "";
+
+    if (params.get("t1")) {
+        t1 = params.get("t1");
+        localStorage.setItem("cozy_task1", t1);
+    }
+    if (params.get("t2")) {
+        t2 = params.get("t2");
+        localStorage.setItem("cozy_task2", t2);
+    }
+
+    const keyBox = document.getElementById("key");
+    const copyBtn = document.getElementById("copy");
+    const loader = document.getElementById("loader");
+    const timeLeftEl = document.getElementById("time-left");
+
+    // ❌ Chưa làm nhiệm vụ nào
+    if (!t1 && !t2) {
+        setTimeout(() => {
+            loader.classList.add("done");
+            keyBox.textContent = "ACCESS DENIED";
+            keyBox.classList.add("show");
+            setMsg("error", "access_denied");
+            setStatus("done");
+        }, 1000);
         return;
     }
 
-    keybox.textContent = json.key;
-    keybox.classList.add("show");
-    copyBtn.classList.add("show");
+    // ❌ Mới làm 1 nhiệm vụ, thiếu 1 cái
+    if (!t1 || !t2) {
+        setTimeout(() => {
+            loader.classList.add("done");
+            keyBox.textContent = "NEED 2 TASKS";
+            keyBox.classList.add("show");
 
-    const remaining = Math.floor((json.expire - Date.now()) / 1000);
+            const msg = document.getElementById("msg");
+            msg.className = "msg show error";
+            msg.textContent = TEXT.need_two_tasks[lang];
 
-    const h = Math.floor(remaining / 3600);
-    const m = Math.floor((remaining % 3600) / 60);
+            setStatus("done");
+        }, 1000);
+        return;
+    }
 
-    msg.innerHTML =
-        (json.reused ? TEXT.reused[lang] : TEXT.newkey[lang]) +
-        `<br>Còn lại: ${h} giờ ${m} phút`;
+    // ✅ Đã đủ 2 nhiệm vụ, xử lý key
+    setTimeout(async () => {
+        try {
+            setStatus("checking");
 
-    msg.classList.add("show");
+            // 1) Lấy IP & userAgent (dùng cho chống spam)
+            const ip = await fetch("https://api.ipify.org?format=json")
+                .then(r => r.json())
+                .then(d => d.ip);
+            const safeIP = ip.replace(/\./g, "_");
+            const ua = navigator.userAgent || "unknown";
+
+            // 2) Chống spam (meta)
+            const metaRef = ref(db, "meta/" + safeIP);
+            const metaSnap = await get(metaRef);
+            const now = Date.now();
+
+            if (metaSnap.exists()) {
+                const meta = metaSnap.val();
+
+                if (meta.bannedUntil && meta.bannedUntil > now) {
+                    loader.classList.add("done");
+                    keyBox.textContent = "BLOCKED";
+                    keyBox.classList.add("show");
+                    setMsg("error", "banned");
+                    setStatus("done");
+                    return;
+                }
+
+                if (meta.lastReq && now - meta.lastReq < 10 * 1000) {
+                    loader.classList.add("done");
+                    keyBox.textContent = "RATE LIMIT";
+                    keyBox.classList.add("show");
+                    setMsg("error", "rate_limit");
+
+                    const strikes = (meta.strikes || 0) + 1;
+                    let bannedUntil = meta.bannedUntil || 0;
+                    if (strikes >= 5) {
+                        bannedUntil = now + 30 * 60 * 1000; // ban 30 phút
+                    }
+                    await update(metaRef, {
+                        lastReq: now,
+                        strikes,
+                        bannedUntil
+                    });
+                    setStatus("done");
+                    return;
+                }
+
+                await update(metaRef, {
+                    lastReq: now,
+                    ua
+                });
+            } else {
+                await set(metaRef, {
+                    lastReq: now,
+                    strikes: 0,
+                    bannedUntil: 0,
+                    ua
+                });
+            }
+
+            // 3) kiểm tra key theo IP
+            const ipRef = ref(db, "ips/" + safeIP);
+            const ipSnap = await get(ipRef);
+
+            let expire, key, keyHash;
+
+            if (ipSnap.exists() && ipSnap.val().expire > now) {
+                const data = ipSnap.val();
+                key = data.key;
+                expire = data.expire;
+                keyHash = data.hash;
+
+                keyBox.textContent = key;
+                keyBox.classList.add("show");
+                copyBtn.classList.add("show");
+                setMsg("ok", "already_taken");
+            } else {
+                // tạo key mới (24h)
+                key = generateKey();
+                expire = now + 24 * 60 * 60 * 1000;
+                keyHash = await sha256(key);
+
+                await set(ipRef, {
+                    key,
+                    hash: keyHash,
+                    expire
+                });
+
+                await set(ref(db, "keys/" + keyHash), {
+                    hash: keyHash,
+                    expire,
+                    used: false,
+                    ip: safeIP
+                    // HWID sẽ bind bên script Roblox
+                });
+
+                keyBox.textContent = key;
+                keyBox.classList.add("show");
+                copyBtn.classList.add("show");
+                setMsg("ok", "key_valid_24h");
+            }
+
+            // loader -> check icon
+            loader.classList.add("done");
+            setStatus("done");
+
+            // 4) hiển thị đếm ngược thời gian còn lại
+            function updateRemaining() {
+                const left = expire - Date.now();
+                timeLeftEl.textContent = formatRemaining(left);
+                if (left <= 0) {
+                    clearInterval(timer);
+                }
+            }
+            updateRemaining();
+            const timer = setInterval(updateRemaining, 60 * 1000);
+
+        } catch (e) {
+            console.error(e);
+            loader.classList.add("done");
+            keyBox.textContent = "ERROR";
+            keyBox.classList.add("show");
+            setMsg("error", "system_error");
+            setStatus("done");
+        }
+    }, 1200);
 }
 
-function copyKey() {
-    const key = document.getElementById("keybox").innerText;
-    navigator.clipboard.writeText(key);
+main();
 
-    const msg = document.getElementById("msg");
-    msg.textContent = TEXT.copied[lang];
-    msg.classList.add("show");
-}
+window.copyKey = function () {
+    const key = document.getElementById("key").innerText.trim();
+    if (!key || key === "..." || key === "ERROR" || key === "ACCESS DENIED" || key === "RATE LIMIT" || key === "BLOCKED" || key === "NEED 2 TASKS") return;
 
-fetchKey();
+    navigator.clipboard.writeText(key).then(() => {
+        const msg = document.getElementById("msg");
+        msg.className = "msg show ok";
+        msg.textContent = TEXT.copied[lang];
+    });
+};
 </script>
+</head>
+<body>
+
+<div class="bg"></div>
+
+<div class="card">
+    <div class="logo"></div>
+    <h1 id="title">CozyHub Key</h1>
+
+    <div class="loader-wrap">
+        <div id="loader" class="loader"></div>
+    </div>
+    <div id="status" class="status">Processing...</div>
+
+    <div id="key" class="keybox">...</div>
+    <div id="time-left" class="time-left"></div>
+    <button id="copy" class="copy-btn" onclick="copyKey()">COPY</button>
+    <div id="msg" class="msg"></div>
+    <div class="small">One key per IP / 24h</div>
+</div>
 
 </body>
 </html>
