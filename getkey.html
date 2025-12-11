@@ -1,206 +1,291 @@
-<script type="module">
-/* ====== auto lang ====== */
-let langRaw = (navigator.language || "en").toLowerCase();
-let lang;
-if (langRaw.startsWith("vi")) lang = "vi";
-else if (langRaw.startsWith("th")) lang = "th";
-else if (langRaw.startsWith("id")) lang = "id";
-else if (langRaw.startsWith("fil") || langRaw.startsWith("ph") || langRaw.startsWith("tl")) lang = "ph";
-else lang = "en";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CozyHub Key</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body {
+    margin:0;
+    background:#050811;
+    color:white;
+    font-family:'Poppins',sans-serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    overflow:hidden;
+    position:relative;
+}
+body::before {
+    content:"";
+    position:absolute;
+    inset:-40%;
+    background:
+        radial-gradient(circle at 20% 0%, rgba(0,255,255,0.2), transparent 60%),
+        radial-gradient(circle at 80% 100%, rgba(0,150,255,0.18), transparent 60%);
+    filter: blur(20px);
+    animation: bgMove 14s ease-in-out infinite alternate;
+    z-index:-3;
+}
+@keyframes bgMove {
+    0% { transform:scale(1); }
+    100% { transform:scale(1.05) translate(3%, -3%); }
+}
+.card {
+    width:420px;
+    max-width:94vw;
+    background:rgba(8,12,22,0.92);
+    border-radius:26px;
+    padding:35px 28px;
+    text-align:center;
+    box-shadow:0 0 40px rgba(0,255,255,0.35);
+    border:1px solid rgba(0,255,255,0.4);
+    position:relative;
+}
+.card::before {
+    content:"";
+    position:absolute;
+    top:-110px; left:50%;
+    width:230px; height:230px;
+    background:radial-gradient(circle, rgba(0,255,255,0.55), transparent 70%);
+    transform:translateX(-50%);
+    filter:blur(30px);
+    z-index:-2;
+}
+.logo {
+    width:110px;height:110px;
+    margin:0 auto 15px;
+    background:url("https://raw.githubusercontent.com/aovo4504-bit/Cozyhub/refs/heads/main/IMG_0830.png") center/cover;
+    border-radius:50%;
+    box-shadow:0 0 22px cyan;
+    animation: pulse 3s infinite;
+}
+@keyframes pulse {
+    0% { box-shadow:0 0 12px cyan; }
+    50% { box-shadow:0 0 28px cyan; }
+    100% { box-shadow:0 0 12px cyan; }
+}
+h1 {
+    font-size:30px;
+    color:#00eaff;
+    text-shadow:0 0 14px cyan;
+    margin-bottom:6px;
+}
+.sub {
+    font-size:14px;
+    opacity:.8;
+    margin-bottom:10px;
+}
+.loader {
+    width:48px; height:48px;
+    margin:15px auto;
+    border:5px solid #123;
+    border-top-color:#00eaff;
+    border-radius:50%;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin { to{transform:rotate(360deg);} }
+.loader.done { border-color:transparent; border-top-color:transparent; }
+
+.keybox {
+    opacity:0;
+    transform:translateY(10px);
+    transition:0.3s;
+    background:#000;
+    padding:12px;
+    border-radius:12px;
+    border:1px solid cyan;
+    box-shadow: inset 0 0 18px rgba(0,255,255,0.45);
+    word-break:break-word;
+    font-size:19px;
+    min-height:24px;
+}
+.keybox.show { opacity:1;transform:translateY(0); }
+
+.copy-btn {
+    margin-top:18px;
+    padding:12px 0;
+    width:100%;
+    background:#00eaff;
+    border:none;
+    font-size:18px;
+    border-radius:12px;
+    font-weight:600;
+    cursor:pointer;
+    transform:translateY(10px);
+    opacity:0;
+    transition:0.25s;
+    box-shadow:0 0 20px rgba(0,255,255,.6);
+}
+.copy-btn.show {
+    opacity:1;
+    transform:translateY(0);
+}
+.copy-btn:hover { transform:scale(1.03); }
+
+.msg {
+    margin-top:10px;
+    opacity:0;
+    transition:0.25s;
+    font-size:14px;
+}
+.msg.show { opacity:1; }
+.msg.ok { color:#79ffb0; }
+.msg.error { color:#ff6b6b; }
+
+.time-left {
+    margin-top:10px;
+    font-size:13px;
+    opacity:.9;
+}
+.small {
+    margin-top:12px;
+    font-size:11px;
+    opacity:.6;
+}
+</style>
+
+<script>
+// Ngôn ngữ mặc định: English
+const LANG = "en";
 const TEXT = {
-  title: { vi:"CozyHub Key", en:"CozyHub Key", th:"CozyHub Key", id:"CozyHub Key", ph:"CozyHub Key" },
-  processing: {
-    vi:"Đang xử lý...",
-    en:"Processing...",
-    th:"กำลังประมวลผล...",
-    id:"Sedang memproses...",
-    ph:"Nagpro-process..."
-  },
-  checking: {
-    vi:"Đang gọi máy chủ...",
-    en:"Contacting server...",
-    th:"กำลังติดต่อเซิร์ฟเวอร์...",
-    id:"Menghubungi server...",
-    ph:"Kinokontak ang server..."
-  },
-  done: {
-    vi:"Hoàn tất.",
-    en:"Done.",
-    th:"เสร็จสิ้น",
-    id:"Selesai.",
-    ph:"Tapos na."
-  },
-  need_both_tasks: {
-    vi:"Bạn phải hoàn thành cả 2 nhiệm vụ trước khi nhận key.",
-    en:"You must complete both missions before getting the key.",
-    th:"คุณต้องทำทั้งสองภารกิจให้เสร็จก่อนรับคีย์",
-    id:"Anda harus menyelesaikan kedua misi sebelum mendapatkan key.",
-    ph:"Kailangan mong tapusin ang dalawang tasks bago makuha ang key."
-  },
-  system_error: {
-    vi:"Lỗi hệ thống, hãy thử lại sau.",
-    en:"System error, please try again later.",
-    th:"เกิดข้อผิดพลาดของระบบ กรุณาลองใหม่ภายหลัง",
-    id:"Terjadi kesalahan sistem, coba lagi nanti.",
-    ph:"System error, subukan ulit mamaya."
-  },
-  copied: {
-    vi:"Đã copy key!",
-    en:"Key copied!",
-    th:"คัดลอกคีย์แล้ว!",
-    id:"Key disalin!",
-    ph:"Nakopya na ang key!"
-  },
-  already_taken: {
-    vi:"Bạn đã lấy key rồi (hiện lại key cũ).",
-    en:"You already claimed a key (showing existing key).",
-    th:"คุณรับคีย์ไปแล้ว (แสดงคีย์เดิม)",
-    id:"Anda sudah mengambil key (menampilkan key lama).",
-    ph:"Nakuha mo na ang key (inuulit lang ang lumang key)."
-  },
-  key_valid_24h: {
-    vi:"Key hợp lệ trong 24 giờ.",
-    en:"Key is valid for 24 hours.",
-    th:"คีย์ใช้ได้ 24 ชั่วโมง",
-    id:"Key berlaku selama 24 jam.",
-    ph:"Valid ang key sa loob ng 24 oras."
-  },
-  time_left_prefix: {
-    vi:"Còn lại:",
-    en:"Time left:",
-    th:"คงเหลือ:",
-    id:"Sisa waktu:",
-    ph:"Oras na natitira:"
-  }
+  blocked:   { en:"You must complete both missions before getting your key." },
+  processing:{ en:"Processing..." },
+  checking:  { en:"Contacting key server..." },
+  key24:     { en:"Key is valid for 24 hours." },
+  already:   { en:"Key already generated earlier (showing existing key)." },
+  copied:    { en:"Key copied!" },
+  error:     { en:"System error, please try again." }
 };
 
-function setStatus(k){ const el=document.getElementById("status"); if(el) el.textContent=TEXT[k][lang]; }
-
-function setMsg(type, textKey){
-  const msg = document.getElementById("msg");
-  msg.className = "msg show " + (type === "error" ? "error" : "ok");
-  msg.textContent = TEXT[textKey][lang];
-}
-
-function formatRemaining(ms){
-  if (ms <= 0) return "expired";
-  const totalSec = Math.floor(ms / 1000);
-  const h = Math.floor(totalSec / 3600);
-  const m = Math.floor((totalSec % 3600) / 60);
-  if (lang === "vi") return `${TEXT.time_left_prefix[lang]} ${h} giờ ${m} phút`;
-  if (lang === "th") return `${TEXT.time_left_prefix[lang]} ${h} ชม. ${m} นาที`;
-  if (lang === "id") return `${TEXT.time_left_prefix[lang]} ${h} jam ${m} menit`;
-  if (lang === "ph") return `${TEXT.time_left_prefix[lang]} ${h}h ${m}m`;
-  return `${TEXT.time_left_prefix[lang]} ${h}h ${m}m`;
-}
-
-/* ====== CHẶN X2 NHIỆM VỤ ====== */
-const tasksOK =
-  localStorage.getItem("cozy_task1") === "done" &&
-  localStorage.getItem("cozy_task2") === "done";
-
-if (!tasksOK) {
-  document.addEventListener("DOMContentLoaded", () => {
+// CHẶN người chưa làm TASK1 + TASK2
+function blockAccess(){
+  const t1 = localStorage.getItem("cozy_task1");
+  const t2 = localStorage.getItem("cozy_task2");
+  if(t1!=="done" || t2!=="done"){
     document.body.innerHTML = `
-      <div style="display:flex;justify-content:center;align-items:center;height:100vh;background:#050811;color:#fff;font-family:'Poppins',system-ui,sans-serif;text-align:center;padding:20px;">
-        <h2>${TEXT.need_both_tasks[lang]}</h2>
+      <div style="height:100vh;display:flex;justify-content:center;align-items:center;
+                  background:#050811;color:white;font-size:18px;text-align:center;padding:20px;">
+        ❌ ${TEXT.blocked[LANG]}
       </div>`;
-  });
-} else {
-  document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("title").textContent = TEXT.title[lang];
-    setStatus("processing");
-    runGetKey();
-  });
+    throw new Error("MISSIONS_NOT_DONE");
+  }
 }
+blockAccess();
+</script>
+</head>
+
+<body>
+<div class="card">
+  <div class="logo"></div>
+  <h1>Cozy Hub Key</h1>
+  <div class="sub" id="status">Processing...</div>
+
+  <div id="loader" class="loader"></div>
+
+  <div id="key" class="keybox">...</div>
+  <div id="time-left" class="time-left"></div>
+
+  <button id="copy" class="copy-btn" onclick="copyKey()">Copy Key</button>
+
+  <div id="msg" class="msg"></div>
+  <div class="small">One key per IP/HWID / 24h</div>
+</div>
+
+<script>
+const REALKEY_URL = "https://cozyhub-api.aovo4504.workers.dev/realkey";
 
 async function runGetKey(){
   const loader = document.getElementById("loader");
   const keyBox = document.getElementById("key");
-  const copyBtn = document.getElementById("copy");
-  const timeLeftEl = document.getElementById("time-left");
+  const copyBtn= document.getElementById("copy");
+  const status = document.getElementById("status");
+  const msg    = document.getElementById("msg");
+  const timeEl = document.getElementById("time-left");
 
+  status.textContent = TEXT.processing[LANG];
   keyBox.textContent = "...";
   keyBox.classList.remove("show");
   copyBtn.classList.remove("show");
-  loader.classList.remove("done");
+  msg.className = "msg";
 
+  // Nếu bạn muốn truyền thêm token cuối, có thể lấy ở đây:
   const params = new URLSearchParams(location.search);
-  const token = (params.get("token") || params.get("code") || "").trim();
+  const token  = params.get("token") || "";
 
-  if (!token){
-    loader.classList.add("done");
-    keyBox.textContent = "NO TOKEN";
-    keyBox.classList.add("show");
-    setMsg("error","system_error");
-    setStatus("done");
-    return;
-  }
-
-  setTimeout(async () => {
+  setTimeout(async ()=>{
+    status.textContent = TEXT.checking[LANG];
     try{
-      setStatus("checking");
-
-      const res = await fetch("https://cozyhub-realkey.aovo4504.workers.dev/", {
+      const res = await fetch(REALKEY_URL,{
         method:"POST",
-        headers:{ "Content-Type":"application/json" },
+        headers:{"Content-Type":"application/json"},
         body:JSON.stringify({
-          token,
-          hwid:"" // sau này bạn có thể gửi HWID từ script Roblox
+          token,    // optional – server có thể bỏ qua
+          hwid:""   // sau này có thể gửi HWID thật từ script Roblox/web
         })
       });
 
       const data = await res.json();
-      if (!data.ok){
+
+      if(!data.ok){
         loader.classList.add("done");
-        keyBox.textContent = (data.code || "ERROR").toUpperCase();
+        keyBox.textContent = "ERROR";
         keyBox.classList.add("show");
-        setMsg("error","system_error");
-        setStatus("done");
-        console.error("realkey error:", data);
+        msg.textContent = data.error || TEXT.error[LANG];
+        msg.className = "msg show error";
+        status.textContent = "Error";
         return;
       }
 
-      const key = data.key;
-      const expire = data.expire;
-
-      keyBox.textContent = key;
+      loader.classList.add("done");
+      keyBox.textContent = data.key;
       keyBox.classList.add("show");
       copyBtn.classList.add("show");
 
-      if (data.reused) setMsg("ok","already_taken");
-      else setMsg("ok","key_valid_24h");
+      msg.textContent = data.reused ? TEXT.already[LANG] : TEXT.key24[LANG];
+      msg.className   = "msg show ok";
+      status.textContent = "Done.";
 
-      loader.classList.add("done");
-      setStatus("done");
-
-      function updateRemaining(){
-        const left = expire - Date.now();
-        timeLeftEl.textContent = formatRemaining(left);
+      const expire = data.expire;
+      function updateLeft(){
+        const ms = expire - Date.now();
+        if(ms <= 0){
+          timeEl.textContent = "Expired.";
+          return;
+        }
+        const h = Math.floor(ms / 3600000);
+        const m = Math.floor((ms % 3600000) / 60000);
+        timeEl.textContent = `Time left: ${h}h ${m}m`;
       }
-      updateRemaining();
-      setInterval(updateRemaining,60*1000);
+      updateLeft();
+      setInterval(updateLeft, 60000);
 
     }catch(e){
       console.error(e);
       loader.classList.add("done");
       keyBox.textContent = "ERROR";
       keyBox.classList.add("show");
-      setMsg("error","system_error");
-      setStatus("done");
+      msg.textContent = TEXT.error[LANG];
+      msg.className = "msg show error";
+      status.textContent = "Error";
     }
-  }, 1200);
+  }, 900);
 }
 
-/* COPY KEY */
-window.copyKey = function(){
+function copyKey(){
   const key = document.getElementById("key").innerText.trim();
-  if (!key || key==="..." || key==="ERROR" || key==="NO TOKEN") return;
+  if(!key || key==="..." || key==="ERROR") return;
   navigator.clipboard.writeText(key).then(()=>{
     const msg = document.getElementById("msg");
-    msg.className = "msg show ok";
-    msg.textContent = TEXT.copied[lang];
+    msg.textContent = TEXT.copied[LANG];
+    msg.className   = "msg show ok";
   });
-};
+}
+
+runGetKey();
 </script>
+</body>
+</html>
