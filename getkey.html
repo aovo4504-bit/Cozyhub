@@ -1,136 +1,83 @@
-<!DOCTYPE html><html lang="en"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>CozyHub Key</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
-<style>
-body{margin:0;font-family:Poppins,system-ui,sans-serif;background:#050811;height:100vh;display:flex;justify-content:center;align-items:center;overflow:hidden;color:#fff}
-.bg{position:fixed;inset:-40%;background:
-radial-gradient(circle at 30% 20%, rgba(0,234,255,.14), transparent 45%),
-radial-gradient(circle at 70% 30%, rgba(0,255,157,.10), transparent 42%),
-radial-gradient(circle at 50% 80%, rgba(120,90,255,.10), transparent 50%);
-filter:blur(10px);animation:float 10s ease-in-out infinite;z-index:-2}
-@keyframes float{0%,100%{transform:translate(0,0)}50%{transform:translate(3%,2%)}}
-.card{width:430px;max-width:92vw;background:rgba(7,11,20,.92);padding:34px 30px 30px;border-radius:26px;text-align:center;
-box-shadow:0 0 45px rgba(0,255,255,.25),0 0 90px rgba(0,255,255,.12);border:1px solid rgba(0,255,255,.25)}
-.logo{width:110px;height:110px;margin:0 auto 16px;border-radius:50%;
-background:url('https://raw.githubusercontent.com/aovo4504-bit/Cozyhub/refs/heads/main/IMG_0830.png') center/cover;
-box-shadow:0 0 18px #00eaff,0 0 40px rgba(0,255,255,.7)}
-h1{font-size:32px;margin:6px 0 18px;color:#00eaff;letter-spacing:.5px;text-shadow:0 0 10px rgba(0,255,255,.6),0 0 18px rgba(0,255,255,.35)}
-.loader-wrap{margin-top:4px;margin-bottom:14px;height:56px;display:flex;align-items:center;justify-content:center}
-.loader{border:5px solid #18202c;border-top:5px solid #00eaff;width:46px;height:46px;border-radius:50%;animation:spin 1.1s linear infinite}
-.loader.done{border-color:transparent;border-top-color:transparent;background:none;position:relative}
-.loader.done::before{content:"✓";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:30px;color:#00ff9d;text-shadow:0 0 14px rgba(0,255,157,.85)}
-@keyframes spin{to{transform:rotate(360deg)}}
-.status{margin-top:4px;font-size:14px;opacity:.8}
-.keybox{margin-top:22px;padding:13px 14px;border-radius:12px;background:rgba(0,0,0,.7);font-size:18px;min-height:26px;letter-spacing:1px;
-text-align:center;border:1px solid rgba(0,255,255,.4);box-shadow:inset 0 0 22px rgba(0,255,255,.35);
-transition:.28s ease;opacity:0;transform:translateY(8px);word-break:break-all}
-.keybox.show{opacity:1;transform:translateY(0)}
-.time-left{margin-top:10px;font-size:13px;opacity:.85}
-.copy-btn{margin-top:18px;padding:12px 0;width:100%;font-weight:700;border-radius:10px;border:none;cursor:pointer;background:#00eaff;color:#001015;
-font-size:16px;box-shadow:0 0 24px rgba(0,255,255,.5);transition:.22s;opacity:0;transform:translateY(8px)}
-.copy-btn.show{opacity:1;transform:translateY(0)}
-.msg{margin-top:10px;font-size:13px;opacity:0;transition:.25s}
-.msg.show{opacity:1}
-.msg.ok{color:#78ff9f}
-.msg.error{color:#ff5b5b}
-.small{margin-top:6px;font-size:11px;opacity:.5}
-</style></head>
-<body>
-<div class="bg"></div>
-<div class="card">
-  <div class="logo"></div>
-  <h1>CozyHub Key</h1>
+<script type="module">
+/* ====== language (EN default) ====== */
+const langRaw=(navigator.language||"en").toLowerCase();
+const LANG = (langRaw.startsWith("vi")?"vi":langRaw.startsWith("th")?"th":langRaw.startsWith("id")?"id":(langRaw.startsWith("fil")||langRaw.startsWith("ph")||langRaw.startsWith("tl"))?"ph":"en");
 
-  <div class="loader-wrap"><div id="loader" class="loader"></div></div>
-  <div id="status" class="status">Processing...</div>
-
-  <div id="key" class="keybox">...</div>
-  <div id="time-left" class="time-left"></div>
-  <button id="copy" class="copy-btn">COPY</button>
-  <div id="msg" class="msg"></div>
-  <div class="small">One key per device / 24h</div>
-</div>
-
-<script>
-const LANG = (localStorage.getItem("cozy_lang") || "en").toLowerCase(); // default EN
-const REALKEY = "https://cozyhub-realkey.aovo4504.workers.dev/";
-
-const TEXT = {
-  processing:{en:"Processing...",vi:"Đang xử lý...",th:"กำลังประมวลผล...",id:"Sedang memproses...",ph:"Nagpro-process..."},
-  contacting:{en:"Contacting server...",vi:"Đang gọi máy chủ...",th:"กำลังติดต่อเซิร์ฟเวอร์...",id:"Menghubungi server...",ph:"Kinokontak ang server..."},
-  done:{en:"Done.",vi:"Hoàn tất.",th:"เสร็จสิ้น",id:"Selesai.",ph:"Tapos na."},
-  needtoken:{en:"Missing token. Please redo missions.",vi:"Thiếu token. Hãy làm lại nhiệm vụ.",th:"ไม่มีโทเค็น กรุณาทำใหม่",id:"Token hilang. Ulangi misi.",ph:"Walang token. Ulitin ang missions."},
-  err:{en:"System error, try again later.",vi:"Lỗi hệ thống, thử lại sau.",th:"ระบบผิดพลาด ลองใหม่ภายหลัง",id:"Error sistem, coba lagi.",ph:"System error, subukan ulit."},
-  reused:{en:"You already claimed a key (showing existing).",vi:"Bạn đã lấy key rồi (hiện key cũ).",th:"รับคีย์แล้ว (แสดงคีย์เดิม)",id:"Sudah ambil key (tampilkan lama).",ph:"Nakuha na (lumang key)."},
-  valid24:{en:"Key is valid for 24 hours.",vi:"Key hợp lệ trong 24 giờ.",th:"คีย์ใช้ได้ 24 ชั่วโมง",id:"Key berlaku 24 jam.",ph:"Valid sa 24 oras."},
-  copied:{en:"Key copied!",vi:"Đã copy!",th:"คัดลอกแล้ว!",id:"Disalin!",ph:"Nakopya!"},
-  left:{en:"Time left:",vi:"Còn lại:",th:"คงเหลือ:",id:"Sisa:",ph:"Natitira:"}
+const TEXT={
+  need_both:{en:"You must complete both missions before getting the key.",vi:"Bạn phải hoàn thành cả 2 nhiệm vụ trước khi nhận key.",th:"คุณต้องทำทั้งสองภารกิจให้เสร็จก่อนรับคีย์",id:"Anda harus menyelesaikan kedua misi sebelum mendapatkan key.",ph:"Kailangan mong tapusin ang dalawang tasks bago makuha ang key."},
+  err:{en:"System error. Try again.",vi:"Lỗi hệ thống. Thử lại.",th:"ระบบผิดพลาด ลองใหม่",id:"Error sistem. Coba lagi.",ph:"System error. Subukan ulit."},
+  copied:{en:"Key copied!",vi:"Đã copy key!",th:"คัดลอกคีย์แล้ว!",id:"Key disalin!",ph:"Nakopya na ang key!"},
+  ok24:{en:"Key is valid for 24 hours.",vi:"Key hợp lệ trong 24 giờ.",th:"คีย์ใช้ได้ 24 ชั่วโมง",id:"Key berlaku selama 24 jam.",ph:"Valid ang key sa loob ng 24 oras."}
 };
 
-const loader=document.getElementById("loader");
+// HARD BLOCK bypass (web layer)
+const ok = localStorage.getItem("cozy_task1")==="done" && localStorage.getItem("cozy_task2")==="done";
+if(!ok){
+  document.body.innerHTML = `<div style="display:flex;justify-content:center;align-items:center;height:100vh;background:#050811;color:#fff;font-family:Poppins,system-ui,sans-serif;text-align:center;padding:20px;">
+    <h2>${TEXT.need_both[LANG]}</h2>
+  </div>`;
+  throw new Error("Not finished missions");
+}
+
+// call realkey (server anti-share)
+const params=new URLSearchParams(location.search);
+const token=(params.get("token")||params.get("code")||"").trim();
+
 const statusEl=document.getElementById("status");
-const keyBox=document.getElementById("key");
-const copyBtn=document.getElementById("copy");
 const msgEl=document.getElementById("msg");
+const keyEl=document.getElementById("key");
+const copyBtn=document.getElementById("copy");
+const loader=document.getElementById("loader");
 const timeLeftEl=document.getElementById("time-left");
 
-function t(k){ return (TEXT[k] && (TEXT[k][LANG]||TEXT[k].en)) || ""; }
-function setMsg(ok, txt){ msgEl.className="msg show "+(ok?"ok":"error"); msgEl.textContent=txt; }
-function fmtLeft(ms){
+function setMsg(ok, text){
+  if(!msgEl) return;
+  msgEl.className="msg show " + (ok?"ok":"error");
+  msgEl.textContent=text;
+}
+function fmt(ms){
   if(ms<=0) return "expired";
   const s=Math.floor(ms/1000), h=Math.floor(s/3600), m=Math.floor((s%3600)/60);
-  return `${t("left")} ${h}h ${m}m`;
+  return (LANG==="vi")?`Còn lại: ${h} giờ ${m} phút`:`Time left: ${h}h ${m}m`;
 }
 
-statusEl.textContent=t("processing");
-const token=(new URLSearchParams(location.search).get("token")||"").trim();
+async function run(){
+  if(statusEl) statusEl.textContent="Contacting server...";
+  try{
+    const res=await fetch("https://cozyhub-realkey.aovo4504.workers.dev/",{
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({ token })
+    });
+    const data=await res.json();
+    if(!data.ok) throw 0;
 
-if(!token){
-  loader.classList.add("done");
-  keyBox.textContent="NO TOKEN";
-  keyBox.classList.add("show");
-  setMsg(false, t("needtoken"));
-  statusEl.textContent=t("done");
-} else {
-  setTimeout(async ()=>{
-    try{
-      statusEl.textContent=t("contacting");
-      const res=await fetch(REALKEY,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token})});
-      const data=await res.json();
-      if(!data.ok){
-        loader.classList.add("done");
-        keyBox.textContent=(data.code||"ERROR").toUpperCase();
-        keyBox.classList.add("show");
-        setMsg(false, t("err"));
-        statusEl.textContent=t("done");
-        return;
-      }
-      keyBox.textContent=data.key;
-      keyBox.classList.add("show");
-      copyBtn.classList.add("show");
-      setMsg(true, data.reused ? t("reused") : t("valid24"));
-      loader.classList.add("done");
-      statusEl.textContent=t("done");
+    keyEl.textContent=data.key;
+    keyEl.classList.add("show");
+    copyBtn.classList.add("show");
+    loader?.classList.add("done");
 
-      const expire=data.expire;
-      const tick=()=>timeLeftEl.textContent=fmtLeft(expire-Date.now());
-      tick(); setInterval(tick,60*1000);
+    setMsg(true, TEXT.ok24[LANG]);
+    if(statusEl) statusEl.textContent="Done.";
 
-      copyBtn.onclick=()=>{
-        navigator.clipboard.writeText(data.key).then(()=>{
-          setMsg(true, t("copied"));
-        });
-      };
-    }catch(e){
-      loader.classList.add("done");
-      keyBox.textContent="ERROR";
-      keyBox.classList.add("show");
-      setMsg(false, t("err"));
-      statusEl.textContent=t("done");
-    }
-  }, 900);
+    const tick=()=>{
+      const left=data.expire - Date.now();
+      if(timeLeftEl) timeLeftEl.textContent=fmt(left);
+    };
+    tick(); setInterval(tick, 60000);
+
+  }catch(e){
+    loader?.classList.add("done");
+    setMsg(false, TEXT.err[LANG]);
+    if(statusEl) statusEl.textContent="Done.";
+  }
 }
+run();
+
+window.copyKey = async function(){
+  const k=(keyEl?.innerText||"").trim();
+  if(!k) return;
+  await navigator.clipboard.writeText(k);
+  setMsg(true, TEXT.copied[LANG]);
+};
 </script>
-</body></html>
