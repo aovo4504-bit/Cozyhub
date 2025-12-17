@@ -295,7 +295,7 @@ function showErr(msgKey){
     const token=(p.get('token')||'').trim();
     if(!token){ showErr('invalid'); setTimeout(()=>location.replace('/'), 1200); return; }
 
-    const STATUS = "https://cozyhub-status.YOURSUBDOMAIN.workers.dev/";
+    const STATUS = "https://cozyhub-status.aovo4504.workers.dev/";
     const st = await fetch(STATUS + "status?task=getkey&token="+encodeURIComponent(token));
     const sdata = await st.json();
     if(sdata.maint){ showErr('system_maint'); return; }
