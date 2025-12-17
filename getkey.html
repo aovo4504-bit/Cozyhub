@@ -301,7 +301,7 @@ function showErr(msgKey){
     if(sdata.maint){ showErr('system_maint'); return; }
     if(!sdata.nv1 || !sdata.nv2){ showErr('invalid'); setTimeout(()=>location.replace('/'), 1200); return; }
 
-    const res = await fetch("https://cozyhub-realkey.YOURSUBDOMAIN.workers.dev/", {
+    const res = await fetch("https://cozyhub-realkey.aovo4504.workers.dev/", {
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body: JSON.stringify({ token })
