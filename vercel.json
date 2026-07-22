@@ -1,7 +1,4 @@
 {
-  "version": 2,
-  "public": true,
-  "name": "com-nguoi-ultra",
   "cleanUrls": true,
   "trailingSlash": false,
   "headers": [
