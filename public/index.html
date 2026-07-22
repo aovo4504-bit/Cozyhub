@@ -3,27 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
-    <title>Topup Service Pro</title>
+    <title>PayGate Pro - Gạch Thẻ & Mua Thẻ</title>
     <meta name="theme-color" content="#020617">
     <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
-    <!-- Ambient Background -->
     <div class="ambient-bg"></div>
 
-    <!-- Header / Navigation -->
     <header class="navbar glass">
         <div class="container nav-inner">
             <div class="brand">
                 <div class="brand-logo">⚡</div>
-                <h1 class="brand-name">Topup<span style="font-weight: 300;">PRO</span></h1>
+                <h1 class="brand-name">PayGate<span style="font-weight: 300;">PRO</span></h1>
             </div>
             <div class="user-stats">
                 <div class="balance-card glass">
-                    <span class="label">Số dư hiện tại</span>
+                    <span class="label">Số dư khả dụng</span>
                     <div class="amount-wrap">
                         <span id="txt-balance" class="amount skeleton-text">---------</span>
-                        <button class="btn-icon" id="btn-refresh-balance" aria-label="Làm mới số dư">
+                        <button class="btn-icon" id="btn-refresh-balance" aria-label="Làm mới">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
                         </button>
                     </div>
@@ -33,42 +31,105 @@
     </header>
 
     <main class="container main-content">
-        <!-- Tra cứu trạng thái đơn -->
-        <section class="status-section glass fade-in">
-            <div class="section-head">
-                <h2>Tra cứu giao dịch</h2>
-                <p>Kiểm tra trạng thái đơn nạp theo Request ID (Mã đơn hàng).</p>
-            </div>
-            <form id="form-check-status" class="flex-row">
-                <div class="input-wrap">
-                    <input type="text" id="input-request-id" class="form-control" placeholder="Nhập Request ID (VD: 116)" required autocomplete="off" spellcheck="false">
+        <!-- Segmented Control (Tabs chuẩn iOS) -->
+        <div class="segmented-control glass fade-in">
+            <button class="segment-btn active" data-tab="tab-exchange">Gạch Thẻ</button>
+            <button class="segment-btn" data-tab="tab-buy">Mua Thẻ / Topup</button>
+            <button class="segment-btn" data-tab="tab-history">Tra Cứu</button>
+        </div>
+
+        <!-- TAB 1: GẠCH THẺ -->
+        <section id="tab-exchange" class="tab-content active fade-in" style="animation-delay: 0.1s;">
+            <div class="glass form-container">
+                <div class="section-head">
+                    <h2>Gạch Thẻ Cào</h2>
+                    <p>Hệ thống nạp thẻ tự động, chiết khấu tốt nhất.</p>
                 </div>
-                <button type="submit" class="btn-primary" id="btn-check">
-                    <span class="btn-text">Kiểm tra</span>
-                    <span class="spinner"></span>
-                </button>
-            </form>
-            <div id="status-result" class="status-result hidden"></div>
+                
+                <form id="form-exchange" novalidate>
+                    <div class="form-group">
+                        <label class="form-label">Chọn nhà mạng</label>
+                        <div class="telco-grid" id="telco-selection">
+                            <button type="button" class="telco-btn active" data-val="VIETTEL">Viettel</button>
+                            <button type="button" class="telco-btn" data-val="VINAPHONE">Vina</button>
+                            <button type="button" class="telco-btn" data-val="MOBIFONE">Mobi</button>
+                            <button type="button" class="telco-btn" data-val="ZING">Zing</button>
+                            <button type="button" class="telco-btn" data-val="GARENA">Garena</button>
+                        </div>
+                        <input type="hidden" id="ex-telco" value="VIETTEL">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="ex-amount">Mệnh giá (Bắt buộc chọn đúng)</label>
+                        <select id="ex-amount" class="form-control" required>
+                            <option value="" disabled selected>-- Chọn mệnh giá --</option>
+                            <option value="10000">10,000 VNĐ</option>
+                            <option value="20000">20,000 VNĐ</option>
+                            <option value="30000">30,000 VNĐ</option>
+                            <option value="50000">50,000 VNĐ</option>
+                            <option value="100000">100,000 VNĐ</option>
+                            <option value="200000">200,000 VNĐ</option>
+                            <option value="300000">300,000 VNĐ</option>
+                            <option value="500000">500,000 VNĐ</option>
+                            <option value="1000000">1,000,000 VNĐ</option>
+                        </select>
+                    </div>
+
+                    <div class="grid-2-col">
+                        <div class="form-group">
+                            <label class="form-label" for="ex-pin">Mã thẻ (PIN)</label>
+                            <input type="text" id="ex-pin" class="form-control" placeholder="Nhập mã dưới lớp bạc" required autocomplete="off" spellcheck="false">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="ex-serial">Số Serial</label>
+                            <input type="text" id="ex-serial" class="form-control" placeholder="Nhập số Serial thẻ" required autocomplete="off" spellcheck="false">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary w-100" id="btn-submit-exchange">
+                        <span class="btn-text">Gửi Thẻ Lên Hệ Thống</span>
+                        <span class="spinner"></span>
+                    </button>
+                </form>
+            </div>
         </section>
 
-        <!-- Danh sách dịch vụ nạp -->
-        <section class="services-section fade-in" style="animation-delay: 0.1s;">
+        <!-- TAB 2: MUA THẺ / TOPUP -->
+        <section id="tab-buy" class="tab-content fade-in">
             <div class="section-head d-flex-between">
                 <div>
                     <h2>Dịch vụ Nạp thẻ & Game</h2>
-                    <p>Chọn dịch vụ để xem các mệnh giá khả dụng.</p>
+                    <p>Click vào dịch vụ để xem các mệnh giá khả dụng.</p>
                 </div>
                 <span id="service-count" class="badge">Đang tải...</span>
             </div>
             
             <div class="product-grid" id="product-grid">
-                <!-- Skeletons Loading -->
+                <!-- Skeletons -->
                 <div class="product-card glass skeleton-box"></div>
                 <div class="product-card glass skeleton-box"></div>
                 <div class="product-card glass skeleton-box"></div>
                 <div class="product-card glass skeleton-box"></div>
-                <div class="product-card glass skeleton-box"></div>
-                <div class="product-card glass skeleton-box"></div>
+            </div>
+        </section>
+
+        <!-- TAB 3: TRA CỨU -->
+        <section id="tab-history" class="tab-content fade-in">
+            <div class="glass form-container">
+                <div class="section-head">
+                    <h2>Tra cứu giao dịch</h2>
+                    <p>Kiểm tra trạng thái đơn hàng (Gạch thẻ/Mua thẻ) bằng Request ID.</p>
+                </div>
+                <form id="form-check-status" class="flex-row">
+                    <div class="input-wrap">
+                        <input type="text" id="input-request-id" class="form-control" placeholder="Nhập Request ID..." required autocomplete="off" spellcheck="false">
+                    </div>
+                    <button type="submit" class="btn-primary" id="btn-check">
+                        <span class="btn-text">Kiểm tra</span>
+                        <span class="spinner"></span>
+                    </button>
+                </form>
+                <div id="status-result" class="status-result hidden"></div>
             </div>
         </section>
     </main>
@@ -88,26 +149,24 @@
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label>Tài khoản nhận / Số điện thoại</label>
+                    <label class="form-label">Tài khoản nhận / SĐT / Email Game</label>
                     <input type="text" class="form-control" placeholder="Nhập thông tin người nhận..." id="topup-account" autocomplete="off">
                 </div>
-                <label style="margin-top: 20px; display: block; margin-bottom: 12px;">Chọn mệnh giá</label>
+                <label class="form-label" style="margin-top: 20px; display: block; margin-bottom: 12px;">Chọn gói / mệnh giá</label>
                 <div class="denominations-grid" id="modal-denominations">
                     <!-- Rendered by JS -->
                 </div>
             </div>
             <div class="modal-footer">
                 <button class="btn-primary w-100" id="btn-submit-topup" disabled style="margin-top: 20px;">
-                    <span class="btn-text">Xác nhận nạp</span>
+                    <span class="btn-text">Thanh toán ngay</span>
                     <span class="spinner"></span>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Container cho Toast Notifications -->
     <div id="toast-container"></div>
-
     <script type="module" src="./js/app.js"></script>
 </body>
 </html>
