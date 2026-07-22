@@ -6,21 +6,17 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#000000">
-    <meta name="description" content="Com Nguoi Cinematic Ultra - Enterprise Streaming System V72">
-    <title>Com Nguoi Ultra V72 - Omni Tracker Engine</title>
+    <meta name="description" content="Com Nguoi Cinematic Ultra - Enterprise Streaming System V73">
+    <title>Com Nguoi Ultra V73 - Realtime Tracker</title>
     
-    <!-- Tích hợp HLS.js để PHÁT NATIVE BYPASS QUẢNG CÁO -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
 
-    <!-- DNS Resolution Optimization -->
     <link rel="preconnect" href="https://phimapi.com" crossorigin>
     <link rel="preconnect" href="https://ophim1.com" crossorigin>
     <link rel="preconnect" href="https://phim.nguonc.com" crossorigin>
+    <link rel="preconnect" href="https://cozyhubkey-default-rtdb.asia-southeast1.firebasedatabase.app" crossorigin>
     
     <style>
-        /* ==========================================================================
-           1. PREMIUM DESIGN TOKENS (VISION OS x NETFLIX)
-           ========================================================================== */
         :root {
             --bg-absolute: #000000;
             --bg-base: #050508;
@@ -28,40 +24,30 @@
             --bg-card: rgba(20, 20, 25, 0.5);
             --bg-glass-strong: rgba(10, 10, 15, 0.85);
             --bg-glass-light: rgba(40, 40, 50, 0.3);
-            
             --border-glass: rgba(255, 255, 255, 0.08);
             --border-glass-hover: rgba(255, 255, 255, 0.2);
-            
             --c-primary: #E50914; 
             --c-primary-glow: rgba(229, 9, 20, 0.5);
             --c-primary-dark: #b80710;
-            
             --c-text-main: #FFFFFF;
             --c-text-muted: #8E8E93;
-            
             --c-success: #32D74B;
             --c-info: #0A84FF;
             --c-warning: #FF9F0A;
             --c-danger: #FF453A;
-            
             --grad-fhd: linear-gradient(135deg, #FF9F0A 0%, #FF453A 100%);
             --grad-hd: linear-gradient(135deg, #0A84FF 0%, #3020FF 100%);
             --grad-vs: linear-gradient(135deg, #32D74B 0%, #009688 100%);
             --grad-tm: linear-gradient(135deg, #E50914 0%, #8E0000 100%);
-            --grad-server: linear-gradient(90deg, rgba(229,9,20,0.8) 0%, rgba(229,9,20,0) 100%);
-            
             --blur-md: blur(20px) saturate(180%);
             --blur-lg: blur(40px) saturate(200%);
-            
             --rad-sm: 8px;
             --rad-md: 12px;
             --rad-lg: 24px;
             --rad-pill: 9999px;
-            
             --font-main: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             --curve-spring: cubic-bezier(0.175, 0.885, 0.32, 1.15);
             --curve-smooth: cubic-bezier(0.25, 1, 0.5, 1);
-            
             --z-nav: 1000;
             --z-modal: 2000;
             --z-toast: 3000;
@@ -166,6 +152,7 @@
         @media (min-width: 1200px) { .card { flex: 0 0 220px; } }
         .grid-layout .card { flex: auto; width: 100%; }
         @media (min-width: 1024px) { .card:hover { transform: translateY(-12px) scale(1.06); z-index: 5; border-color: rgba(255,255,255,0.3); box-shadow: 0 25px 50px rgba(0,0,0,0.9); } }
+
         .card-img { width: 100%; height: 100%; object-fit: cover; background: #111; transition: filter 0.4s; }
         @media (min-width: 1024px) { .card:hover .card-img { filter: brightness(0.4); } }
         .card-badges-top { position: absolute; top: 8px; right: 8px; display: flex; gap: 4px; z-index: 3; flex-wrap: wrap; justify-content: flex-end; width: calc(100% - 16px); pointer-events: none;}
@@ -216,7 +203,6 @@
 
         .filter-action-bar { position: sticky; bottom: -20px; left: 0; width: 100%; padding: 20px 0 0 0; background: linear-gradient(to top, var(--bg-base) 60%, transparent 100%); display: flex; gap: 12px; z-index: 5; margin-top: 10px; }
 
-        /* Detail View */
         #detail-view { position: relative; padding-top: 70px; min-height: 100dvh; z-index: 2; }
         @media (min-width: 768px) { #detail-view { padding-top: 80px; padding-bottom: 80px; } }
         
@@ -238,27 +224,29 @@
         .dt-desc p { margin-bottom: 10px; }
         .dt-desc p:last-child { margin-bottom: 0; }
 
-        /* Player */
         .player-box { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: var(--rad-md); overflow: hidden; border: 1px solid var(--border-glass); box-shadow: 0 20px 40px rgba(0,0,0,0.8); margin-bottom: 20px; position: relative; display: flex; align-items: center; justify-content: center;}
         .player-box video, .player-box iframe { width: 100%; height: 100%; border: none; object-fit: contain; outline: none; background: #000; position: absolute; inset: 0;}
         .player-placeholder { color: #555; text-align: center; padding: 20px; z-index: 1; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 10px;}
         .warning-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 20px; text-align: center; z-index: 10;}
+        
         .player-watermark { position: absolute; top: 16px; right: 16px; font-size: 14px; font-weight: 800; color: rgba(255,255,255,0.4); text-shadow: 0 2px 4px rgba(0,0,0,0.8); pointer-events: none; z-index: 5; user-select: none; letter-spacing: 1px;}
         @media (min-width: 768px) { .player-watermark { font-size: 18px; top: 24px; right: 24px;} }
 
-        /* Tabs UI */
         .cascading-wrapper { background: rgba(0,0,0,0.4); backdrop-filter: var(--blur-sm); border-radius: var(--rad-md); border: 1px solid var(--border-glass); overflow: hidden; margin-top: 10px; }
         .source-tabs { display: flex; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--border-glass); background: rgba(0,0,0,0.3); }
         .source-btn { flex: 1; min-width: 110px; padding: 16px 10px; font-size: 14px; font-weight: 800; color: var(--c-text-muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: center; cursor: pointer; transition: 0.3s; border-bottom: 3px solid transparent; }
         .source-btn:hover { color: #fff; background: rgba(255,255,255,0.05); }
         .source-btn.active { color: var(--c-primary); border-bottom-color: var(--c-primary); background: rgba(229, 9, 20, 0.05); }
+
         .type-tabs { display: flex; gap: 10px; padding: 16px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .type-btn { padding: 8px 16px; border-radius: var(--rad-pill); background: rgba(255,255,255,0.08); border: 1px solid var(--border-glass); color: var(--c-text-muted); font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.3s; white-space: nowrap; text-transform: uppercase;}
         .type-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
         .type-btn.active { background: #fff; color: #000; border-color: #fff; box-shadow: 0 4px 15px rgba(255,255,255,0.2); }
+
         .ep-grid-container { padding: 20px 16px; animation: fadeIn 0.3s var(--curve-smooth); }
         .ep-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; }
         @media (min-width: 768px) { .ep-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; } }
+        
         .ep-btn { background: rgba(255,255,255,0.08); border: 1px solid var(--border-glass); padding: 12px 8px; border-radius: var(--rad-sm); font-weight: 700; font-size: 13px; text-align: center; transition: all 0.2s; color: #fff; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer;}
         .ep-btn:hover { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.4); transform: translateY(-2px); }
         .ep-btn.active { background: var(--grad-fhd); border: none; box-shadow: 0 4px 15px rgba(255,69,58,0.4); color: #fff;}
@@ -267,17 +255,18 @@
 
         .related-container { margin-top: 50px; border-top: 1px solid var(--border-glass); padding-top: 40px; }
 
-        /* DOWNLOAD PORTAL */
         .form-group { margin-bottom: 20px; }
         .form-label { display: block; font-size: 13px; font-weight: 700; color: var(--c-text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;}
         .form-select { width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass); border-radius: var(--rad-sm); color: #fff; font-size: 15px; font-weight: 600; appearance: none;}
         .form-select:focus { border-color: var(--c-primary); outline: none;}
         .form-select option { background: var(--bg-base); color: #fff;}
+        
         .dl-os-tabs { display: flex; border-bottom: 1px solid var(--border-glass); margin-bottom: 20px;}
         .dl-os-btn { flex: 1; padding: 12px; text-align: center; color: var(--c-text-muted); font-weight: 700; cursor: pointer; transition: 0.3s; border-bottom: 3px solid transparent;}
         .dl-os-btn.active { color: #fff; border-bottom-color: var(--c-info); background: rgba(10, 132, 255, 0.1); }
         .dl-os-content { display: none; padding: 10px 0;}
         .dl-os-content.active { display: block; animation: fadeIn 0.4s; }
+
         .download-code-box { background: rgba(0,0,0,0.6); padding: 16px; border-radius: var(--rad-sm); border: 1px solid var(--border-glass); font-family: monospace; font-size: 13px; color: var(--c-success); word-break: break-all; margin-bottom: 20px; user-select: all;}
         .dl-guide-text { font-size: 14px; color: var(--c-text-muted); line-height: 1.6; margin-bottom: 16px; background: rgba(255,255,255,0.05); padding: 12px; border-radius: var(--rad-sm);}
 
@@ -287,10 +276,8 @@
 </head>
 <body>
 
-    <!-- DYNAMIC ISLAND -->
     <div id="dynamic-island"><div class="spinner"></div><span id="island-msg">Khởi động hệ thống...</span></div>
 
-    <!-- NAVBAR -->
     <nav id="navbar">
         <div class="nav-brand text-gradient" onclick="App.Router.goHome()">COM NGUOI</div>
         <div class="nav-menu">
@@ -310,7 +297,6 @@
         </div>
     </nav>
 
-    <!-- SEARCH PORTAL -->
     <div id="search-portal" class="portal">
         <div class="portal-content">
             <div class="portal-drag"></div>
@@ -320,7 +306,6 @@
         </div>
     </div>
 
-    <!-- FILTER PORTAL -->
     <div id="filter-portal" class="portal">
         <div class="portal-content" style="max-width: 900px;">
             <div class="portal-drag"></div>
@@ -376,7 +361,6 @@
         </div>
     </div>
 
-    <!-- DOWNLOAD PORTAL V71 -->
     <div id="download-portal" class="portal">
         <div class="portal-content" style="max-width: 600px;">
             <div class="portal-drag"></div>
@@ -420,21 +404,18 @@
                     </div>
                 </div>
 
-                <!-- OS Detection Tabs -->
                 <div class="dl-os-tabs">
                     <div class="dl-os-btn" id="tab-os-pc" onclick="App.Download.switchOS('pc')">💻 Máy Tính</div>
                     <div class="dl-os-btn" id="tab-os-android" onclick="App.Download.switchOS('android')">📱 Android</div>
                     <div class="dl-os-btn" id="tab-os-ios" onclick="App.Download.switchOS('ios')">🍏 iOS</div>
                 </div>
 
-                <!-- PC Content -->
                 <div id="dl-content-pc" class="dl-os-content">
                     <div class="download-code-box" id="dl-code-pc">Đang tạo lệnh...</div>
                     <button class="btn btn-primary" style="width:100%; margin-bottom:12px;" onclick="App.Download.copyCode('dl-code-pc')">Sao chép lệnh FFmpeg</button>
                     <button class="btn btn-glass" style="width:100%" onclick="App.Download.copyLink()">Sao chép Link Gốc</button>
                 </div>
 
-                <!-- Android Content -->
                 <div id="dl-content-android" class="dl-os-content">
                     <div class="download-code-box" id="dl-code-android">Đang tạo lệnh...</div>
                     <button class="btn btn-primary" style="width:100%; margin-bottom:20px;" onclick="App.Download.copyCode('dl-code-android')">Sao chép lệnh Termux</button>
@@ -442,7 +423,6 @@
                     <button class="btn" style="width:100%; background:var(--c-info); color:#fff;" onclick="App.Download.open1DM()">Mở bằng app 1DM</button>
                 </div>
 
-                <!-- iOS Content -->
                 <div id="dl-content-ios" class="dl-os-content">
                     <div class="download-code-box" id="dl-code-ios">Đang tạo lệnh...</div>
                     <button class="btn btn-primary" style="width:100%; margin-bottom:20px;" onclick="App.Download.copyCode('dl-code-ios')">Sao chép lệnh a-Shell</button>
@@ -454,7 +434,6 @@
         </div>
     </div>
 
-    <!-- HOME VIEW -->
     <div id="home-view">
         <header id="hero-section">
             <div class="hero-bg skeleton" id="hero-bg-img"></div>
@@ -469,7 +448,6 @@
         <main class="home-main" id="main-content"></main>
     </div>
 
-    <!-- DETAIL VIEW -->
     <div id="detail-view" class="view-hidden">
         <img src="" id="dt-backdrop" class="dt-bg-blur" referrerpolicy="no-referrer">
         <div class="dt-container">
@@ -506,51 +484,24 @@
     </div>
 
     <footer>
-        <h2 class="text-gradient" style="font-size: 24px; margin-bottom: 10px;">COM NGUOI ULTRA V72</h2>
-        <p class="foot-text">The Omni Tracker Engine. Tích hợp giải pháp Tracking Serverless Real-time với Firebase V10 Modular SDK. Chuyển đổi mã nguồn 100% sang ES Modules để đảm bảo tính đóng gói an toàn. Phát nhịp đập ẩn danh tự động báo cáo số lượng người dùng (CCU) lên Firestore cho Admin Dashboard. Toàn bộ tính năng V71 (Bypass Iframe, Render Video FFmpeg Đa nền tảng) vẫn được bảo toàn nguyên vẹn. Developed by Senior Architect 2026.</p>
+        <h2 class="text-gradient" style="font-size: 24px; margin-bottom: 10px;">COM NGUOI ULTRA V73</h2>
+        <p class="foot-text">The Realtime Database Integration Engine. Hệ thống đã nâng cấp toàn diện lên Firebase Realtime Database (Đông Nam Á) qua SDK v10 ESM. Khắc phục triệt để thời gian chờ bằng cơ chế Presence (Hủy kết nối tự động onDisconnect). Tối ưu hóa render video, bypass ad-iframe, responsive Glassmorphism 60FPS. Developed by Senior Architect 2026.</p>
     </footer>
 
-    <!-- ==========================================================================
-         CORE JAVASCRIPT ENGINE (ES MODULES + FIREBASE V10)
-         ========================================================================== -->
+    <!-- REALTIME DATABASE MODULE V10 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getDatabase, ref, set, onDisconnect, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-        /**
-         * ==========================================
-         * CẤU HÌNH FIREBASE (Dành cho Admin Tracking)
-         * ==========================================
-         * Thay thế object này bằng config trong Firebase Console của bạn.
-         */
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY_HERE",
-            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT_ID.appspot.com",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
-
-        window.addEventListener('unhandledrejection', function(event) {
-            console.error('Unhandled Promise Rejection:', event.reason);
-            const island = document.getElementById('dynamic-island');
-            if(island) island.classList.remove('active');
-        });
-
-        const safeAllSettled = (promises) => {
-            return Promise.all(promises.map(p => Promise.resolve(p)
-                .then(value => ({ status: 'fulfilled', value }))
-                .catch(reason => ({ status: 'rejected', reason }))
-            ));
-        };
+        const DB_URL = "https://cozyhubkey-default-rtdb.asia-southeast1.firebasedatabase.app/";
+        let dbRef = null;
+        let userPresenceRef = null;
 
         const Config = {
             API: { A: 'https://phimapi.com', B: 'https://phim.nguonc.com/api', C: 'https://ophim1.com' },
             CDN: { PHIMIMG: 'https://phimimg.com/', OPHIM: 'https://img.ophim.live/uploads/movies/' },
             NET: { TIMEOUT_FAST: 4000, TIMEOUT_DETAIL: 8000, LIMIT_NORM: 24, LIMIT_FLT: 48 }, 
-            STORAGE_KEY: 'comnguoi_v72_mem',
+            STORAGE_KEY: 'comnguoi_v73_mem',
             PROXY_CONFIG: {
                 proxies: ['https://api.allorigins.win/raw?url=', 'https://corsproxy.io/?'],
                 fakeHeaders: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'Referer': 'https://phim.nguonc.com/', 'Origin': 'https://phim.nguonc.com' },
@@ -650,15 +601,6 @@
                 const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="450" viewBox="0 0 300 450"><rect width="100%" height="100%" fill="#1a1a24"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-weight="800" font-size="20" fill="#555555">${text}</text></svg>`;
                 return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
             }
-        };
-
-        const Storage = {
-            data: {},
-            init: () => { try { Storage.data = JSON.parse(localStorage.getItem(Config.STORAGE_KEY)) || {}; } catch { Storage.data = {}; } },
-            save: () => { try { localStorage.setItem(Config.STORAGE_KEY, JSON.stringify(Storage.data)); } catch(e){} },
-            setHistory: (slug, epSlug, epName, poster) => { Storage.data[slug] = { epSlug, epName, poster, ts: Date.now() }; Storage.save(); },
-            getHistory: (slug) => Storage.data[slug] || null,
-            getAllHistory: () => Object.entries(Storage.data).map(([slug, val]) => ({slug, ...val})).sort((a,b) => b.ts - a.ts)
         };
 
         class NetworkManager {
@@ -771,13 +713,46 @@
         };
 
         const App = {
+            Tracker: {
+                init: () => {
+                    try {
+                        const app = initializeApp({ databaseURL: DB_URL });
+                        dbRef = getDatabase(app, DB_URL);
+                        
+                        let sid = localStorage.getItem('comnguoi_sid');
+                        if (!sid) {
+                            sid = 'usr_' + Math.random().toString(36).substring(2, 9);
+                            localStorage.setItem('comnguoi_sid', sid);
+                        }
+                        
+                        userPresenceRef = ref(dbRef, 'active_users/' + sid);
+                        onDisconnect(userPresenceRef).remove();
+                        App.Tracker.ping("Đang lướt trang chủ...", "");
+                    } catch(e) {
+                        console.warn("RTDB Tracker Init Fail:", e);
+                    }
+                },
+
+                ping: (movieName, epName) => {
+                    if(!userPresenceRef) return;
+                    try {
+                        const osInfo = App.Download.detectOS();
+                        set(userPresenceRef, {
+                            os: osInfo,
+                            currentMovie: movieName || "Đang lướt trang chủ...",
+                            currentEp: epName || "",
+                            lastActive: serverTimestamp()
+                        }).catch(() => {});
+                    } catch(e) {}
+                }
+            },
+
             Router: {
                 goHome: () => {
                     document.getElementById('home-view').classList.remove('view-hidden');
                     document.getElementById('detail-view').classList.add('view-hidden');
                     window.scrollTo(0, 0);
                     App.Player.destroy();
-                    // V72 FIREBASE PING
                     App.Tracker.ping("Đang lướt trang chủ...", "");
                 },
                 goDetail: (slug, originSource) => {
@@ -808,6 +783,7 @@
                     const lowQ = (q||'').toLowerCase();
                     if(lowQ.includes('fhd')) html += `<span class="badge badge-premium-fhd">FHD</span>`;
                     else html += `<span class="badge badge-premium-hd">HD</span>`;
+
                     const lowL = (l||'').toLowerCase();
                     if(lowL.includes('thuyết minh') || lowL.includes('tm')) html += `<span class="badge badge-premium-tm">TM</span>`;
                     else if(lowL.includes('lồng tiếng') || lowL.includes('lt')) html += `<span class="badge badge-premium-tm">LT</span>`;
@@ -1385,15 +1361,8 @@
                                     let raw_m3u8 = i.link_m3u8 || i.m3u8 || i.hls_link || '';
                                     let raw_embed = i.link_embed || i.embed || i.iframe_url || i.link || '';
                                     let m3u8 = App.Extract.getM3u8(raw_m3u8, raw_embed);
-                                    
                                     if (!m3u8 && !raw_embed) return null; 
-
-                                    return { 
-                                        name: i.name || `Tập ${i.episode || '1'}`, 
-                                        slug: i.slug || i.name || 'tap-1', 
-                                        m3u8: m3u8,
-                                        embed: raw_embed
-                                    };
+                                    return { name: i.name || `Tập ${i.episode || '1'}`, slug: i.slug || i.name || 'tap-1', m3u8: m3u8, embed: raw_embed };
                                 }).filter(i => i !== null);
                                 
                                 if(cleanEps.length > 0) {
@@ -1410,7 +1379,7 @@
 
                     App.Detail.state.dataMap = dataMap;
                     
-                    // V72 FIREBASE PING
+                    // V73 REALTIME PING PHIM
                     App.Tracker.ping(best.name, "");
 
                     App.UI.showToast('Khởi tạo thành công', false); App.UI.hideToast();
@@ -1582,7 +1551,7 @@
                     
                     Storage.setHistory(movSlug, epSlug, epName, poster);
                     
-                    // V72 FIREBASE PING
+                    // V73 REALTIME PING PHIM + TẬP
                     const currentMovieTitle = document.getElementById('dt-title').innerText;
                     App.Tracker.ping(currentMovieTitle, epName);
 
@@ -1593,7 +1562,7 @@
                             <div class="player-watermark">comnguoi.dqdns.org</div>
                             <div class="warning-overlay">
                                 <svg viewBox="0 0 24 24" width="48" height="48" stroke="var(--c-warning)" fill="none" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                                <h3 style="font-size:18px; font-weight:800; color:#fff;">Nguồn phát chứa Iframe lậu</h3>
+                                <h3 style="font-size:18px; font-weight:800; color:#fff;">Nguồn phát chứa Iframe</h3>
                                 <p style="font-size:14px; color:rgba(255,255,255,0.7); max-width:80%;">Server này ép dùng Trình phát bên thứ 3. Có thể chứa Pop-up nhảy trang độc hại.</p>
                                 <div style="display:flex; gap:12px; margin-top:10px;">
                                     <button class="btn btn-glass" onclick="App.Player.destroy()">Hủy Bỏ</button>
@@ -1659,64 +1628,6 @@
                 }
             },
 
-            // ==========================================
-            // V72: FIREBASE TRACKING ENGINE
-            // ==========================================
-            Tracker: {
-                db: null,
-                auth: null,
-                uid: null,
-                interval: null,
-                
-                init: async () => {
-                    try {
-                        if(!firebaseConfig || firebaseConfig.apiKey === "YOUR_API_KEY_HERE") return; // Bỏ qua nếu chưa điền Config
-                        
-                        const app = initializeApp(firebaseConfig);
-                        App.Tracker.auth = getAuth(app);
-                        App.Tracker.db = getFirestore(app);
-                        
-                        // Đăng nhập ẩn danh tạo UID duy nhất cho thiết bị
-                        const userCred = await signInAnonymously(App.Tracker.auth);
-                        App.Tracker.uid = userCred.user.uid;
-                        
-                        App.Tracker.ping("Đang lướt trang chủ...", "");
-                        
-                        // Gửi Heartbeat mỗi 60 giây để Admin biết còn Online
-                        App.Tracker.interval = setInterval(() => {
-                            const currentMovie = document.getElementById('dt-title').innerText;
-                            const isActivePlayer = !document.getElementById('home-view').classList.contains('view-hidden');
-                            
-                            if (isActivePlayer && currentMovie !== "Đang tải...") {
-                                // Lấy tên tập phim đang active
-                                const activeEpBtn = document.querySelector('.ep-btn.active');
-                                const epName = activeEpBtn ? activeEpBtn.innerText.trim() : "";
-                                App.Tracker.ping(currentMovie, epName);
-                            } else {
-                                App.Tracker.ping("Đang lướt trang chủ...", "");
-                            }
-                        }, 60000);
-                    } catch(e) { 
-                        console.warn('Firebase Tracking bị lỗi hoặc bị chặn bởi trình duyệt:', e); 
-                    }
-                },
-
-                ping: async (movieName, epName) => {
-                    if(!App.Tracker.uid || !App.Tracker.db) return;
-                    try {
-                        const osInfo = App.Download.detectOS();
-                        const userRef = doc(App.Tracker.db, "active_users", App.Tracker.uid);
-                        
-                        await setDoc(userRef, {
-                            os: osInfo,
-                            currentMovie: movieName,
-                            currentEp: epName,
-                            lastActive: serverTimestamp()
-                        }, { merge: true });
-                    } catch(e) {}
-                }
-            },
-
             Boot: () => {
                 Storage.init(); App.Home.initStructure(); App.Home.startQueue(); App.Search.init(); App.Filter.init();
                 window.addEventListener('scroll', () => {
@@ -1726,14 +1637,14 @@
             }
         };
 
-        // EXPOSE TO GLOBAL SCOPE ĐỂ THẺ HTML <BUTTON ONCLICK="..."> GỌI ĐƯỢC
+        // EXPOSE TO GLOBAL SCOPE
         window.App = App;
         window.Utils = Utils;
         window.Config = Config;
 
         document.addEventListener('DOMContentLoaded', () => {
             App.Boot();
-            App.Tracker.init(); // Bắt đầu Tracking
+            App.Tracker.init();
         });
 
     </script>
