@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+    <title>Topup Service Pro</title>
+    <meta name="theme-color" content="#020617">
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+    <!-- Ambient Background -->
+    <div class="ambient-bg"></div>
+
+    <!-- Header / Navigation -->
+    <header class="navbar glass">
+        <div class="container nav-inner">
+            <div class="brand">
+                <div class="brand-logo">⚡</div>
+                <h1 class="brand-name">Topup<span style="font-weight: 300;">PRO</span></h1>
+            </div>
+            <div class="user-stats">
+                <div class="balance-card glass">
+                    <span class="label">Số dư hiện tại</span>
+                    <div class="amount-wrap">
+                        <span id="txt-balance" class="amount skeleton-text">---------</span>
+                        <button class="btn-icon" id="btn-refresh-balance" aria-label="Làm mới số dư">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container main-content">
+        <!-- Tra cứu trạng thái đơn -->
+        <section class="status-section glass fade-in">
+            <div class="section-head">
+                <h2>Tra cứu giao dịch</h2>
+                <p>Kiểm tra trạng thái đơn nạp theo Request ID (Mã đơn hàng).</p>
+            </div>
+            <form id="form-check-status" class="flex-row">
+                <div class="input-wrap">
+                    <input type="text" id="input-request-id" class="form-control" placeholder="Nhập Request ID (VD: 116)" required autocomplete="off" spellcheck="false">
+                </div>
+                <button type="submit" class="btn-primary" id="btn-check">
+                    <span class="btn-text">Kiểm tra</span>
+                    <span class="spinner"></span>
+                </button>
+            </form>
+            <div id="status-result" class="status-result hidden"></div>
+        </section>
+
+        <!-- Danh sách dịch vụ nạp -->
+        <section class="services-section fade-in" style="animation-delay: 0.1s;">
+            <div class="section-head d-flex-between">
+                <div>
+                    <h2>Dịch vụ Nạp thẻ & Game</h2>
+                    <p>Chọn dịch vụ để xem các mệnh giá khả dụng.</p>
+                </div>
+                <span id="service-count" class="badge">Đang tải...</span>
+            </div>
+            
+            <div class="product-grid" id="product-grid">
+                <!-- Skeletons Loading -->
+                <div class="product-card glass skeleton-box"></div>
+                <div class="product-card glass skeleton-box"></div>
+                <div class="product-card glass skeleton-box"></div>
+                <div class="product-card glass skeleton-box"></div>
+                <div class="product-card glass skeleton-box"></div>
+                <div class="product-card glass skeleton-box"></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal cấu hình nạp thẻ -->
+    <div class="modal-overlay hidden" id="modal-topup">
+        <div class="modal-content glass">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <img src="" alt="icon" id="modal-icon" class="product-img" style="width: 48px; height: 48px;">
+                    <div>
+                        <h3 id="modal-title">Dịch vụ</h3>
+                        <p id="modal-subtitle" style="font-size: 13px; color: var(--text-secondary);">Chọn mệnh giá nạp</p>
+                    </div>
+                </div>
+                <button class="btn-close" id="btn-close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Tài khoản nhận / Số điện thoại</label>
+                    <input type="text" class="form-control" placeholder="Nhập thông tin người nhận..." id="topup-account" autocomplete="off">
+                </div>
+                <label style="margin-top: 20px; display: block; margin-bottom: 12px;">Chọn mệnh giá</label>
+                <div class="denominations-grid" id="modal-denominations">
+                    <!-- Rendered by JS -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary w-100" id="btn-submit-topup" disabled style="margin-top: 20px;">
+                    <span class="btn-text">Xác nhận nạp</span>
+                    <span class="spinner"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container cho Toast Notifications -->
+    <div id="toast-container"></div>
+
+    <script type="module" src="./js/app.js"></script>
+</body>
+</html>
