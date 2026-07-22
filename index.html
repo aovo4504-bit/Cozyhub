@@ -1,125 +1,99 @@
 <!DOCTYPE html>
-<html lang="vi" data-theme="dark">
+<html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Gạch Thẻ - Production Ready</title>
-    <meta name="theme-color" content="#0f172a">
-    <link rel="stylesheet" href="./css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Đổi Thẻ</title>
+
+<style>
+body{
+background:#0f172a;
+font-family:Arial;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+color:#fff;
+}
+.box{
+width:350px;
+padding:20px;
+background:#1e293b;
+border-radius:20px;
+}
+input,select,button{
+width:100%;
+padding:12px;
+margin:8px 0;
+border:none;
+border-radius:10px;
+}
+button{
+background:#3b82f6;
+color:white;
+cursor:pointer;
+}
+#msg{
+margin-top:15px;
+}
+</style>
+
 </head>
 <body>
-    <div class="app-background"></div>
 
-    <header class="navbar glass-panel">
-        <div class="container navbar-inner">
-            <div class="brand">
-                <div class="brand-logo">⚡</div>
-                <h1 class="brand-name">PayGate PRO</h1>
-            </div>
-            <div class="nav-actions">
-                <button class="btn-icon" id="btn-theme" aria-label="Toggle Theme">🌓</button>
-                <div class="user-chip">
-                    <span class="user-status"></span>
-                    <span class="user-balance">0đ</span>
-                </div>
-            </div>
-        </div>
-    </header>
+<div class="box">
 
-    <main class="container main-layout">
-        <!-- Khu vực Form Gạch Thẻ -->
-        <section class="card-section glass-panel fade-in">
-            <div class="section-header">
-                <h2>Đổi Thẻ Tự Động</h2>
-                <p>Kết nối trực tiếp API Hệ thống</p>
-            </div>
+<h2>Đổi Thẻ Cào</h2>
 
-            <form id="form-exchange" class="exchange-form" novalidate>
-                <div class="form-group">
-                    <label class="form-label">Nhà mạng</label>
-                    <div class="telco-grid" id="telco-grid">
-                        <!-- Rendered by JS -->
-                        <button type="button" class="telco-btn active" data-telco="VIETTEL">Viettel</button>
-                        <button type="button" class="telco-btn" data-telco="VINAPHONE">Vina</button>
-                        <button type="button" class="telco-btn" data-telco="MOBIFONE">Mobi</button>
-                        <button type="button" class="telco-btn" data-telco="ZING">Zing</button>
-                    </div>
-                    <input type="hidden" id="card_telco" value="VIETTEL">
-                </div>
+<select id="telco">
+<option>VIETTEL</option>
+<option>VINAPHONE</option>
+<option>MOBIFONE</option>
+</select>
 
-                <div class="form-group">
-                    <label class="form-label" for="card_amount">Mệnh giá (Bắt buộc chọn đúng)</label>
-                    <div class="select-wrapper">
-                        <select class="form-control" id="card_amount" required>
-                            <option value="" disabled selected>Chọn mệnh giá thẻ</option>
-                            <option value="10000">10,000 VNĐ</option>
-                            <option value="20000">20,000 VNĐ</option>
-                            <option value="50000">50,000 VNĐ</option>
-                            <option value="100000">100,000 VNĐ</option>
-                            <option value="200000">200,000 VNĐ</option>
-                            <option value="500000">500,000 VNĐ</option>
-                            <option value="1000000">1,000,000 VNĐ</option>
-                        </select>
-                    </div>
-                </div>
+<input id="serial" placeholder="Serial">
 
-                <div class="form-group">
-                    <label class="form-label" for="card_pin">Mã thẻ (PIN)</label>
-                    <input type="text" class="form-control" id="card_pin" placeholder="Nhập mã thẻ cào" autocomplete="off" spellcheck="false" required>
-                </div>
+<input id="code" placeholder="Mã thẻ">
 
-                <div class="form-group">
-                    <label class="form-label" for="card_serial">Số Serial</label>
-                    <input type="text" class="form-control" id="card_serial" placeholder="Nhập số Serial thẻ" autocomplete="off" spellcheck="false" required>
-                </div>
+<button onclick="send()">Đổi Thẻ</button>
 
-                <button type="submit" class="btn-submit" id="btn-submit">
-                    <span class="btn-text">Nạp Thẻ Ngay</span>
-                    <span class="btn-spinner"></span>
-                </button>
-            </form>
-        </section>
+<div id="msg"></div>
 
-        <!-- Khu vực Lịch sử Giao dịch -->
-        <section class="history-section glass-panel fade-in" style="animation-delay: 0.1s;">
-            <div class="section-header d-flex-between">
-                <h2>Lịch Sử Giao Dịch</h2>
-                <div class="table-actions">
-                    <button class="btn-outline" id="btn-refresh">
-                        <span class="icon">🔄</span> Làm mới
-                    </button>
-                </div>
-            </div>
+</div>
 
-            <div class="table-container">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Mã GD (Request ID)</th>
-                            <th>Thời gian</th>
-                            <th>Nhà mạng</th>
-                            <th>Mệnh giá</th>
-                            <th>Mã/Serial</th>
-                            <th>Trạng thái API</th>
-                        </tr>
-                    </thead>
-                    <tbody id="history-tbody">
-                        <!-- Dữ liệu được nhúng qua JS DocumentFragment -->
-                        <tr>
-                            <td colspan="6" class="text-center empty-state">
-                                Chưa có giao dịch nào trong phiên này.
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-    </main>
+<script>
 
-    <!-- Hệ thống Toast Notification -->
-    <div id="toast-layer" class="toast-layer"></div>
+async function send(){
 
-    <!-- Khởi tạo App bằng Module -->
-    <script type="module" src="./js/app.js"></script>
+msg.innerHTML="Đang gửi...";
+
+const res=await fetch("/api/callback",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+telco:telco.value,
+
+serial:serial.value,
+
+code:code.value
+
+})
+
+});
+
+const data=await res.json();
+
+msg.innerHTML=data.message;
+
+}
+
+</script>
+
 </body>
 </html>
