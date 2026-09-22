@@ -6,8 +6,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#000000">
-    <meta name="description" content="Com Nguoi Cinematic Ultra - Enterprise Streaming System V77">
-    <title>Com Nguoi Ultra V77 - Smooth Scroll Engine</title>
+    <meta name="description" content="Com Nguoi Cinematic Ultra - Enterprise Streaming System V78">
+    <title>Com Nguoi Ultra V78 - Native Scroll Engine</title>
     
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
 
@@ -55,7 +55,10 @@
         }
 
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html, body { width: 100%; min-height: 100dvh; background-color: var(--bg-absolute); color: var(--c-text-main); font-family: var(--font-main); overflow-x: hidden; scroll-behavior: smooth; overscroll-behavior-y: none; -webkit-font-smoothing: antialiased; }
+        
+        /* V78 FIX: Mở khóa cuộn dọc toàn cục */
+        html, body { width: 100%; min-height: 100dvh; background-color: var(--bg-absolute); color: var(--c-text-main); font-family: var(--font-main); overflow-x: hidden; scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+        
         body::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(circle at 15% 50%, rgba(229, 9, 20, 0.08) 0%, transparent 50%), radial-gradient(circle at 85% 100%, rgba(10, 132, 255, 0.05) 0%, transparent 50%); will-change: transform; }
         button, input, select { border: none; background: transparent; font-family: inherit; color: inherit; outline: none; cursor: pointer; }
         input { cursor: text; }
@@ -134,18 +137,18 @@
         @media (min-width: 768px) { .section-title { font-size: 24px; } }
         .section-title::before { content: ''; width: 5px; height: 24px; background: var(--c-primary); border-radius: var(--rad-pill); box-shadow: 0 0 12px var(--c-primary-glow); }
         
-        /* V77 FIX: CSS cho việc vuốt mượt 1 ngón tay trên điện thoại và PC */
+        /* V78 FIX: Loại bỏ CSS cản trở Native Scroll của thiết bị di động */
         .slider-container { position: relative; width: 100%; display: flex; align-items: center; }
         .slider-track { 
-            display: flex; gap: 12px; overflow-x: auto; 
-            scroll-snap-type: x proximity; padding: 10px 20px 40px 20px; 
+            display: flex; gap: 12px; 
+            overflow-x: auto; overflow-y: hidden;
+            scroll-snap-type: x proximity; 
+            padding: 10px 20px 40px 20px; 
             flex-grow: 1; align-items: stretch; scroll-behavior: smooth; 
             -webkit-overflow-scrolling: touch; 
-            touch-action: pan-x pan-y; /* Bắt buộc để nhận diện 1 ngón tay */
             scrollbar-width: none; will-change: transform; 
-            cursor: grab; /* Con trỏ kéo thả trên PC */
+            cursor: grab; 
         }
-        .slider-track:active { cursor: grabbing; }
         @media (min-width: 768px) { .slider-track { gap: 16px; padding: 10px 5vw 40px 5vw; } }
         
         .slider-arrow { display: none; }
@@ -399,12 +402,12 @@
     </div>
 
     <footer>
-        <h2 class="text-gradient" style="font-size: 24px; margin-bottom: 10px;">COM NGUOI ULTRA V77</h2>
-        <p class="foot-text">The Smooth Scroll Engine. Lược bỏ hoàn toàn module Tải Video dư thừa, giúp hệ thống quay trở lại độ mượt nguyên bản. Tích hợp thuật toán "Vanilla Drag-to-Scroll" hỗ trợ kéo thả tự nhiên bằng chuột trên PC mà không cần thanh cuộn. Bổ sung cấu hình `touch-action: pan-x pan-y` khắc phục dứt điểm lỗi kẹt cảm ứng trên Android, cho phép vuốt ngang một ngón trơn tru. Developed by Senior Architect 2026.</p>
+        <h2 class="text-gradient" style="font-size: 24px; margin-bottom: 10px;">COM NGUOI ULTRA V78</h2>
+        <p class="foot-text">The Native-First Scroll Engine. Đã loại bỏ hoàn toàn module Download để tối ưu 100% dung lượng cho trải nghiệm Streaming. Giải quyết triệt để lỗi "kẹt ngón tay" trên Android bằng cách khôi phục cơ chế Native Scroll vật lý. Tích hợp Module kéo chuột "Mouse-Only Drag" tinh xảo chỉ chạy trên PC, không can thiệp vào Event Touch của Mobile, giúp cuộn màn hình dọc mượt mà ở 120Hz. Lõi Tracking Firebase Realtime tiếp tục chạy ngầm hoàn hảo. Developed by Senior Architect 2026.</p>
     </footer>
 
     <!-- ==========================================================================
-         CORE JAVASCRIPT ENGINE (V77)
+         CORE JAVASCRIPT ENGINE (V78)
          ========================================================================== -->
     <script>
         window.addEventListener('unhandledrejection', function(event) {
@@ -424,7 +427,7 @@
             API: { A: 'https://phimapi.com', B: 'https://phim.nguonc.com/api', C: 'https://ophim1.com' },
             CDN: { PHIMIMG: 'https://phimimg.com/', OPHIM: 'https://img.ophim.live/uploads/movies/' },
             NET: { TIMEOUT_FAST: 4000, TIMEOUT_DETAIL: 8000, LIMIT_NORM: 24, LIMIT_FLT: 48 }, 
-            STORAGE_KEY: 'comnguoi_v77_mem',
+            STORAGE_KEY: 'comnguoi_v78_mem',
             PROXY_CONFIG: {
                 proxies: ['https://api.allorigins.win/get?url=', 'https://api.codetabs.com/v1/proxy?quest='],
                 fakeHeaders: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'Referer': 'https://phim.nguonc.com/', 'Origin': 'https://phim.nguonc.com' },
@@ -450,51 +453,6 @@
             years: Array.from({length: 37}, (_, i) => ({ id: `${2026 - i}`, label: `${2026 - i}` })),
             sorts: [{ id: 'modified.time:desc', label: 'Mới cập nhật' }, { id: 'year:desc', label: 'Năm phát hành mới nhất' }, { id: '_id:desc', label: 'Mới thêm vào hệ thống' }]
         };
-
-        const Sections = [
-            { id: 'sec-1', title: 'Mới Cập Nhật', type: 'new', p: '' },
-            { id: 'sec-2', title: 'Phim Chiếu Rạp', type: 'list', p: 'phim-chieu-rap' },
-            { id: 'sec-3', title: 'Phim Bộ', type: 'list', p: 'phim-bo' },
-            { id: 'sec-4', title: 'Phim Lẻ', type: 'list', p: 'phim-le' },
-            { id: 'sec-5', title: 'Thuyết Minh', type: 'list', p: 'phim-thuyet-minh' },
-            { id: 'sec-6', title: 'Lồng Tiếng', type: 'list', p: 'phim-long-tieng' },
-            { id: 'sec-7', title: 'Vietsub', type: 'list', p: 'phim-vietsub' },
-            { id: 'sec-8', title: 'Hoạt Hình', type: 'list', p: 'hoat-hinh' },
-            { id: 'sec-9', title: 'TV Shows', type: 'list', p: 'tv-shows' },
-            { id: 'sec-10', title: 'Hành Động', type: 'category', p: 'hanh-dong' },
-            { id: 'sec-11', title: 'Khoa Học Viễn Tưởng', type: 'category', p: 'vien-tuong' }, 
-            { id: 'sec-12', title: 'Tình Cảm', type: 'category', p: 'tinh-cam' },
-            { id: 'sec-13', title: 'Kinh Dị', type: 'category', p: 'kinh-di' },
-            { id: 'sec-14', title: 'Hài Hước', type: 'category', p: 'hai-huoc' },
-            { id: 'sec-15', title: 'Cổ Trang', type: 'category', p: 'co-trang' },
-            { id: 'sec-16', title: 'Hình Sự', type: 'category', p: 'hinh-su' },
-            { id: 'sec-17', title: 'Tâm Lý', type: 'category', p: 'tam-ly' },
-            { id: 'sec-18', title: 'Chiến Tranh', type: 'category', p: 'chien-tranh' },
-            { id: 'sec-19', title: 'Thể Thao', type: 'category', p: 'the-thao' },
-            { id: 'sec-20', title: 'Võ Thuật', type: 'category', p: 'vo-thuat' },
-            { id: 'sec-21', title: 'Bí Ẩn', type: 'category', p: 'bi-an' },
-            { id: 'sec-22', title: 'Thần Thoại', type: 'category', p: 'than-thoai' },
-            { id: 'sec-23', title: 'Học Đường', type: 'category', p: 'hoc-duong' },
-            { id: 'sec-24', title: 'Gia Đình', type: 'category', p: 'gia-dinh' },
-            { id: 'sec-25', title: 'Hàn Quốc', type: 'country', p: 'han-quoc' },
-            { id: 'sec-26', title: 'Trung Quốc', type: 'country', p: 'trung-quoc' },
-            { id: 'sec-27', title: 'Âu Mỹ', type: 'country', p: 'au-my' },
-            { id: 'sec-28', title: 'Thái Lan', type: 'country', p: 'thai-lan' },
-            { id: 'sec-29', title: 'Nhật Bản', type: 'country', p: 'nhat-ban' },
-            { id: 'sec-30', title: 'Ấn Độ', type: 'country', p: 'an-do' },
-            { id: 'sec-31', title: 'Đài Loan', type: 'country', p: 'dai-loan' },
-            { id: 'sec-32', title: 'Hồng Kông', type: 'country', p: 'hong-kong' },
-            { id: 'sec-33', title: 'Vũ Trụ Marvel', type: 'search', p: 'Marvel' }, 
-            { id: 'sec-34', title: 'Vũ Trụ DC', type: 'search', p: 'DC' },
-            { id: 'sec-35', title: 'Doraemon', type: 'search', p: 'Doraemon' },
-            { id: 'sec-36', title: 'Shin Cậu Bé Bút Chì', type: 'search', p: 'Shin bút chì' },
-            { id: 'sec-37', title: 'Thám Tử Conan', type: 'search', p: 'Conan' },
-            { id: 'sec-38', title: 'Godzilla', type: 'search', p: 'Godzilla' },
-            { id: 'sec-39', title: 'Transformers', type: 'search', p: 'Transformer' },
-            { id: 'sec-40', title: 'Tài Liệu', type: 'category', p: 'tai-lieu' },
-            { id: 'sec-41', title: 'Âm Nhạc', type: 'category', p: 'am-nhac' },
-            { id: 'sec-42', title: 'Đam Mỹ / Bách Hợp', type: 'category', p: 'dam-my' }
-        ];
 
         const normalizeString = (str) => {
             if (!str) return '';
@@ -524,7 +482,8 @@
                 const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="450" viewBox="0 0 300 450"><rect width="100%" height="100%" fill="#1a1a24"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-weight="800" font-size="20" fill="#555555">${text}</text></svg>`;
                 return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
             },
-            // V77 TÍCH HỢP DRAG-TO-SCROLL CHO MOUSE (PC) VÀ KHẮC PHỤC KẸT CẢM ỨNG (ANDROID)
+            
+            // V78 FIX: Native-First Scroll (Chỉ bắt sự kiện CHUỘT, bỏ qua CẢM ỨNG)
             enableDragScroll: (elementId) => {
                 const slider = document.getElementById(elementId);
                 if(!slider) return;
@@ -532,26 +491,29 @@
                 let startX;
                 let scrollLeft;
 
-                // Mouse Events (PC)
+                // CHỈ dùng mouse event cho PC
                 slider.addEventListener('mousedown', (e) => {
                     isDown = true;
-                    slider.classList.add('active');
+                    slider.style.cursor = 'grabbing';
                     startX = e.pageX - slider.offsetLeft;
                     scrollLeft = slider.scrollLeft;
                 });
+                
                 slider.addEventListener('mouseleave', () => {
                     isDown = false;
-                    slider.classList.remove('active');
+                    slider.style.cursor = 'grab';
                 });
+                
                 slider.addEventListener('mouseup', () => {
                     isDown = false;
-                    slider.classList.remove('active');
+                    slider.style.cursor = 'grab';
                 });
+                
                 slider.addEventListener('mousemove', (e) => {
                     if (!isDown) return;
-                    e.preventDefault(); // Ngăn hành vi copy text/kéo ảnh mặc định
+                    e.preventDefault(); // Cái này giờ chỉ chặn kéo bôi đen chuột, không dính tới cảm ứng
                     const x = e.pageX - slider.offsetLeft;
-                    const walk = (x - startX) * 2; // Tốc độ trượt
+                    const walk = (x - startX) * 1.5; 
                     slider.scrollLeft = scrollLeft - walk;
                 });
             }
@@ -721,7 +683,7 @@
                 pingInternal: (movieName, epName, setFunc, serverTimestampFunc) => {
                     try {
                         const ua = navigator.userAgent || navigator.vendor || window.opera;
-                        let osInfo = 'PC';
+                        let osInfo = 'PC / Mac';
                         if (/android/i.test(ua)) osInfo = 'Android';
                         if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) osInfo = 'iOS';
 
@@ -872,7 +834,6 @@
                     
                     Sections.forEach(s => { 
                         App.Home.states[s.id] = { page: 1, loading: false, hasMore: true }; 
-                        // Kích hoạt Drag-to-Scroll cho PC
                         Utils.enableDragScroll(`trk-${s.id}`);
                     });
                 },
@@ -1383,11 +1344,12 @@
                             let found = episodes.find(e => e.slug === h.epSlug);
                             if(found) { firstM3u8 = found.m3u8; firstEmbed = found.embed; firstName = found.name; firstSlug = found.slug; }
                         }
+                        
                         const playBtnBox = document.getElementById('play-button-container');
                         const isSafe = firstM3u8 !== '';
-                        // V77 FIX: Gỡ bỏ nút Download, Phóng to nút Xem phim chiếm toàn bộ chiều rộng
+                        // V78 FIX: Gỡ bỏ nút Download, Nút Play chiếm 100% diện tích
                         playBtnBox.innerHTML = `
-                            <button class="btn ${isSafe ? 'btn-primary' : 'btn-danger'}" style="width: 100%;" data-m3u8="${firstM3u8}" data-embed="${firstEmbed}" data-mslug="${movieSlug}" data-epslug="${firstSlug}" data-epname="${Utils.escape(firstName)}" data-poster="${moviePoster}" onclick="App.Player.play(this)"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> ${h ? `Tiếp tục: ${Utils.escape(h.epName)}` : 'Phát Phim Nhanh'}</button>
+                            <button class="btn ${isSafe ? 'btn-primary' : 'btn-danger'}" style="width:100%;" data-m3u8="${firstM3u8}" data-embed="${firstEmbed}" data-mslug="${movieSlug}" data-epslug="${firstSlug}" data-epname="${Utils.escape(firstName)}" data-poster="${moviePoster}" onclick="App.Player.play(this)"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> ${h ? `Tiếp tục: ${Utils.escape(h.epName)}` : 'Phát Phim Nhanh'}</button>
                         `;
                     }
                 }
@@ -1411,7 +1373,7 @@
                         
                         if(items.length > 0) {
                             trk.innerHTML = items.slice(0, 16).map(m => App.UI.buildCard(m, 'A')).join('');
-                            // Kích hoạt lại Kéo chuột PC cho thanh liên quan
+                            // Kích hoạt Drag-to-Scroll cho PC
                             Utils.enableDragScroll('trk-related');
                         } else {
                             document.getElementById('related-container').style.display = 'none';
